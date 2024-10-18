@@ -1,0 +1,85 @@
+body {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background-color: black;
+  margin: 0;
+}
+.a {
+  width: 29px;
+  background-color: red;
+  height: 125px;
+  margin-top: 55px;
+  transform: rotate(-46deg);
+  margin-left: 51px;
+}
+.heart-container {
+  position: relative;
+  width: 200px;
+  height: 200px;
+}
+
+.heart {
+  position: absolute;
+  top: 50px;
+  left: 50px;
+  width: 100px;
+  height: 100px;
+  background-color: red;
+  transform: rotate(-45deg);
+  border-radius: 50px 50px 0 0;
+}
+
+.heart::before,
+.heart::after {
+  content: '';
+  position: absolute;
+  width: 100px;
+  height: 100px;
+  background-color: red;
+  border-radius: 50%;
+}
+
+.heart::before {
+  top: -50px;
+  left: 0;
+}
+
+.heart::after {
+  left: 50px;
+  top: 0;
+}
+
+.wing {
+  position: absolute;
+  width: 80px;
+  height: 40px;
+  background-color: #ffffff;
+  border-radius: 50%;
+  animation: flap 1s infinite;
+}
+
+.left-wing {
+  top: 52px;
+  left: -50px;
+  transform-origin: right center;
+  animation-delay: 0.2s;
+}
+
+.right-wing {
+  top: 40px;
+  right: -50px;
+  transform-origin: left center;
+  animation-delay: 0.2s;
+}
+
+@keyframes flap {
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+  50% {
+    transform: rotate(15deg);
+  }
+}

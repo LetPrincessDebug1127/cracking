@@ -1,0 +1,57 @@
+body {
+  font-family: Arial, sans-serif;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  background-color: #f0f0f0;
+}
+img {
+  max-width: 100%;
+  height: auto;
+}
+.question {
+  margin: 20px 0;
+  font-size: 24px;
+}
+.answer {
+  padding: 10px;
+  font-size: 18px;
+}
+
+.running-pig {
+  width: 100px; /* Kích thước hình ảnh */
+  position: relative;
+  animation: run 2s infinite alternate; /* Hiệu ứng animation */
+}
+
+@keyframes run {
+  0% {
+    left: 0; /* Vị trí ban đầu */
+  }
+  100% {
+    left: 300px; /* Vị trí cuối */
+  }
+}
+body {
+  font-family: Arial, sans-serif;
+  text-align: center;
+  margin: 50px;
+}
+input {
+  padding: 10px;
+  font-size: 16px;
+}
+button {
+  padding: 10px 20px;
+  font-size: 16px;
+}
+#message {
+  margin-top: 20px;
+  font-size: 20px;
+}
+.running-pig {
+  width: 200px;
+  height: auto;
+}
