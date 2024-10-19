@@ -7,6 +7,23 @@ body {
   height: 100vh;
   background-color: #f0f0f0;
 }
+.css-login-tag {
+  color: purple;
+  text-decoration: none;
+  font-size: 16px;
+  font-weight: bold;
+  transition: color 0.3s ease;
+  padding: 20px;
+}
+.css-login-tag:hover {
+  color: #2980b9; /* Màu khi hover */
+  text-decoration: underline; /* Gạch dưới khi hover */
+}
+
+.css-login-tag:focus {
+  outline: none; /* Bỏ viền khi được chọn */
+  color: #2980b9; /* Màu khi được chọn */
+}
 img {
   max-width: 100%;
   height: auto;
@@ -54,4 +71,17 @@ button {
 .running-pig {
   width: 200px;
   height: auto;
+}
+/* Thêm một số CSS cho form đăng ký và đăng nhập */
+#registrationForm,
+#loginForm {
+  display: none; /* Ẩn form khi tải trang */
+  margin-bottom: 20px;
+}
+
+#loginLink {
+  display: block;
+  margin-top: 10px;
+  cursor: pointer;
+  color: blue;
 }

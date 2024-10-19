@@ -5,12 +5,37 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Câu Hỏi - Trò Chơi Đoán Số</title>
     <link rel="stylesheet" href="./css/index.css" />
-    <style></style>
   </head>
   <body>
     <img src="img/my-pig.png" alt="heo-con" class="running-pig" />
     <div class="question">Câu hỏi: Con heo này đang giữ số mấy?</div>
-    <button id="startGame">Bắt Đầu Trò Chơi Đoán Số</button>
+
+    <!-- Form hỏi người dùng có muốn đăng ký không -->
+    <div id="registrationPrompt">
+      <p>Bạn có muốn đăng ký tài khoản để lưu tiến trình trò chơi không?</p>
+      <button id="registerYes">Có</button>
+      <button id="registerNo">Không</button>
+      <!-- Thêm liên kết "Tôi đã có tài khoản" -->
+      <a id="loginLink">Tôi đã có tài khoản</a>
+    </div>
+
+    <!-- Form đăng ký tài khoản -->
+    <div id="registrationForm">
+      <input type="text" id="username" placeholder="Tên đăng nhập" />
+      <input type="password" id="password" placeholder="Mật khẩu" />
+      <button id="registerButton">Đăng ký</button>
+    </div>
+
+    <!-- Form đăng nhập -->
+    <div id="loginForm">
+      <input type="text" id="loginUsername" placeholder="Tên đăng nhập" />
+      <input type="password" id="loginPassword" placeholder="Mật khẩu" />
+      <button id="loginButton">Đăng nhập</button>
+    </div>
+
+    <button id="startGame" style="display: none">
+      Bắt Đầu Trò Chơi Đoán Số
+    </button>
     <div id="gameSection" style="display: none">
       <h2>Đoán số từ 1 đến 100:</h2>
       <input type="number" id="guessInput" placeholder="Nhập số của bạn" />
@@ -18,36 +43,6 @@
       <div id="message"></div>
     </div>
 
-    <script>
-      const startButton = document.getElementById('startGame');
-      const guessButton = document.getElementById('guessButton');
-      const guessInput = document.getElementById('guessInput');
-      const messageDiv = document.getElementById('message');
-      const gameSection = document.getElementById('gameSection');
-
-      startButton.addEventListener('click', async () => {
-        messageDiv.innerText = 'Trò chơi đang bắt đầu...';
-        gameSection.style.display = 'block';
-        messageDiv.innerText = data;
-      });
-
-      guessButton.addEventListener('click', async () => {
-        const guess = guessInput.value;
-        console.log(guess);
-        if (!guess) {
-          messageDiv.innerText = 'Vui lòng nhập số!';
-          return;
-        }
-        const response = await fetch(
-          `http://localhost:5000/game/guess?number=${guess}`,
-          {
-            method: 'POST',
-          },
-        );
-        const data = await response.text();
-        messageDiv.innerText = data;
-        guessInput.value = '';
-      });
-    </script>
+    <script src="./js/index.js"></script>
   </body>
 </html>

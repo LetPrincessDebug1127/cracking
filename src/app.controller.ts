@@ -2,12 +2,10 @@ import { Controller, Get, Query, Post } from '@nestjs/common';
 import { ApiTags, ApiResponse } from '@nestjs/swagger';
 import { AppService } from './app.service';
 
-@ApiTags('game') // Thêm tag cho Swagger
+@ApiTags('game')
 @Controller('game')
 export class AppController {
   constructor(private readonly appService: AppService) {}
-
-  // /game/guess?number=${guess}
   @Post('guess')
   @ApiResponse({ status: 200, description: 'Chưa biết để description gì' })
   @ApiResponse({ status: 400, description: 'Chưa biết để description gì' })
