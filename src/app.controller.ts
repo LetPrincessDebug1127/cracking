@@ -17,9 +17,9 @@ export class AppController {
     return this.appService.guessNumber(userGuess);
   }
 
-  @Get('current-number')
-  @ApiResponse({ status: 200, description: 'Lấy số hiện tại.' })
-  getCurrentNumber(): number {
-    return this.appService.getCurrentNumber();
-  }
+  // @Get('current-number')
+  // @ApiResponse({ status: 200, description: 'Lấy số hiện tại.' })
+  // getCurrentNumber(): number {
+  //   return this.appService.getCurrentNumber();
+  // }
 }
