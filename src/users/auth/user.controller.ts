@@ -52,4 +52,10 @@ export class UsersController {
   async getAllUsers(): Promise<any> {
     return this.usersService.getAllUsers();
   }
+  @Post('logout')
+  @ApiOperation({ summary: 'Đăng xuất người dùng' })
+  @ApiResponse({ status: 200, description: 'Đăng xuất thành công' })
+  async logout(): Promise<any> {
+    return { message: 'Đăng xuất thành công' }; // Bạn có thể xử lý thêm nếu cần
+  }
 }

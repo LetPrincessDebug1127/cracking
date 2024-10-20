@@ -21,10 +21,14 @@ export class UsersService {
     if (user && user.password === password) {
       return user; // Nếu tên đăng nhập và mật khẩu đúng, trả về thông tin người dùng
     }
-    return null; // Nếu sai, trả về null
+    return 'bạn gì đó ơi'; // Nếu sai, trả về null
   }
 
   async getAllUsers(): Promise<any> {
     return this.userModel.find().exec();
+  }
+  async logout(): Promise<any> {
+    // Xử lý logout nếu cần thiết
+    return { message: 'Đăng xuất thành công' }; // Trả về thông báo
   }
 }

@@ -8,14 +8,15 @@ export class AppService {
     this.secretNumber = 21;
   }
 
-  guessNumber(userGuess: number): string {
+  // Nhận thêm username làm tham số
+  guessNumber(userGuess: number, username: string): string {
     if (userGuess === this.secretNumber) {
-      const message = `Chúc mừng! Bạn đã đoán đúng số. Trò chơi kết thúc!`;
+      const message = `Chúc mừng ${username}! Bạn đã đoán đúng số. Trò chơi kết thúc!`;
       return message;
     } else if (userGuess < this.secretNumber) {
-      return 'Gợi ý : số đúng là tổng số lượng các ký tự trong câu hỏi, không bao gồm khoảng cách và "Câu hỏi:" !! Số của bạn đang nhỏ hơn';
+      return 'Gợi ý: số đúng là tổng số lượng các ký tự trong câu hỏi, không bao gồm khoảng cách và "Câu hỏi:" !! Số của bạn đang nhỏ hơn';
     } else {
-      return 'Gợi ý : số đúng là tổng số lượng các ký tự trong câu hỏi, không bao gồm khoảng cách và "Câu hỏi:" !! Số của bạn đang lớn hơn';
+      return 'Gợi ý: số đúng là tổng số lượng các ký tự trong câu hỏi, không bao gồm khoảng cách và "Câu hỏi:" !! Số của bạn đang lớn hơn';
     }
   }
 
