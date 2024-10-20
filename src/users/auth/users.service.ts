@@ -19,9 +19,9 @@ export class UsersService {
   async validateUser(username: string, password: string): Promise<any> {
     const user = await this.userModel.findOne({ username }).exec();
     if (user && user.password === password) {
-      return user; // Nếu tên đăng nhập và mật khẩu đúng, trả về thông tin người dùng
+      return user;
     }
-    return 'bạn gì đó ơi'; // Nếu sai, trả về null
+    return null; 
   }
 
   async getAllUsers(): Promise<any> {

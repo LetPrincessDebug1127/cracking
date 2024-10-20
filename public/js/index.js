@@ -67,9 +67,9 @@ document.getElementById('loginButton').addEventListener('click', async () => {
 
   if (response.ok) {
     const data = await response.json();
-    alert(data.message); // Hiển thị thông báo từ server
-    startButton.style.display = 'block'; // Hiện nút bắt đầu trò chơi
-    loginForm.style.display = 'none'; // Ẩn form đăng nhập
+    alert(data.message);
+    startButton.style.display = 'block';
+    loginForm.style.display = 'none';
     sessionStorage.setItem('username', username); // Lưu tên người dùng vào session
   } else {
     const error = await response.json();
@@ -77,47 +77,46 @@ document.getElementById('loginButton').addEventListener('click', async () => {
   }
 });
 
-// Xử lý khi người dùng nhấn nút bắt đầu trò chơi
 startButton.addEventListener('click', () => {
-  messageDiv.innerText = 'Trò chơi đang bắt đầu...'; // Thông báo bắt đầu trò chơi
-  gameSection.style.display = 'block'; // Hiện phần chơi trò chơi
-  startButton.style.display = 'none'; // Ẩn nút bắt đầu sau khi nhấn
+  messageDiv.innerText = 'Trò chơi đang bắt đầu...';
+  gameSection.style.display = 'block';
+  startButton.style.display = 'none';
 });
 
-/// Xử lý khi người dùng nhấn nút đoán
 guessButton.addEventListener('click', async () => {
   const guess = guessInput.value;
-  const username = sessionStorage.getItem('username'); // Lấy tên người dùng từ session
+  const username = sessionStorage.getItem('username');
 
   if (!guess) {
-    messageDiv.innerText = 'Vui lòng nhập số!'; // Thông báo nếu không có giá trị
+    messageDiv.innerText = 'Vui lòng nhập số!';
     return;
   }
 
   const response = await fetch(
-    `http://localhost:5000/game/guess?number=${guess}&username=${username}`, // Thêm username vào URL
+    `http://localhost:5000/game/guess?number=${guess}&username=${username}`,
     {
       method: 'POST',
     },
   );
 
-  const data = await response.text(); // Nhận phản hồi từ server
-  messageDiv.innerText = data; // Hiển thị thông điệp từ server
-  guessInput.value = ''; // Xóa input đoán
+  const data = await response.text();
+  messageDiv.innerText = data;
 
-  // Kiểm tra xem người dùng đã đoán đúng số hay chưa
+  if (data.includes('Chúc mừng')) {
+    logoutButton.style.display = 'block';
+  }
 
-  logoutButton.style.display = 'block'; // Hiện nút đăng xuất
+  guessInput.value = '';
 });
 
 const logoutButton = document.getElementById('logoutButton');
+const findMore = document.getElementById('find-more');
 
-// Xử lý khi người dùng nhấn nút đăng xuất
 logoutButton.addEventListener('click', () => {
-  sessionStorage.removeItem('username'); // Xóa tên người dùng khỏi session
-  startButton.style.display = 'none'; // Ẩn nút bắt đầu trò chơi
-  // Hiển thị lại form đăng nhập
+  sessionStorage.removeItem('username');
+  startButton.style.display = 'none';
   logoutButton.style.display = 'none';
   gameSection.style.display = 'none';
   startButton.style.display = 'block';
+  findMore.style.display = 'block';
 });

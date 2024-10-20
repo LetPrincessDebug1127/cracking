@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Mindmap Hover Tooltip</title>
+    <link rel="stylesheet" href="./css/logic.css" />
+  </head>
+  <body>
+    <div class="mindmap">
+      <div
+        class="node center-node"
+        data-tooltip="Tóm tắt nội dung của trò chơi đoán số bằng NestJS"
+      >
+        Tóm tắt
+        <div
+          class="node children-node"
+          data-tooltip="Các Controller được sử dụng"
+        >
+          Controller
+          <div class="node" data-tooltip="Quản lý người dùng">
+            UsersController
+          </div>
+          <div class="node" data-tooltip="Quản lý game đoán số">
+            AppController
+          </div>
+        </div>
+        <div
+          class="node children-node"
+          data-tooltip="Các Service để thực hiện logic"
+        >
+          Service
+          <div class="node" data-tooltip="Xử lý logic người dùng">
+            UsersService
+          </div>
+          <div class="node" data-tooltip="Xử lý logic trò chơi đoán số">
+            AppService
+          </div>
+        </div>
+        <div
+          class="node children-node"
+          data-tooltip="Dependency Injection giữa Service và Controller"
+        >
+          Dependency Injection
+          <div
+            class="node"
+            data-tooltip="Injection giữa UsersService và UsersController"
+          >
+            UsersService & UsersController
+          </div>
+          <div
+            class="node"
+            data-tooltip="Injection giữa AppService và AppController"
+          >
+            AppService & AppController
+          </div>
+        </div>
+        <div
+          class="node children-node"
+          data-tooltip="Data Transfer Object dùng để chuyển dữ liệu"
+        >
+          DTO (Data Transfer Object)
+          <div class="node" data-tooltip="DTO để tạo người dùng">
+            CreateUserDto
+          </div>
+          <div class="node" data-tooltip="DTO để đăng nhập người dùng">
+            LoginUserDto
+          </div>
+        </div>
+        <div
+          class="node children-node"
+          data-tooltip="Middleware chưa có trong code"
+        >
+          Middleware
+          <div class="node">Trong code chưa có</div>
+        </div>
+        <div
+          class="node children-node"
+          data-tooltip="Exception Filters chưa có trong code"
+        >
+          Exception Filters
+          <div class="node">Trong code chưa có</div>
+        </div>
+        <div class="node children-node" data-tooltip="Pipes chưa có trong code">
+          Pipes
+          <div class="node">Trong code chưa có</div>
+        </div>
+        <div
+          class="node children-node"
+          data-tooltip="Guards chưa có trong code"
+        >
+          Guards
+          <div class="node">Trong code chưa có</div>
+        </div>
+        <div
+          class="node children-node"
+          data-tooltip="API documentation với Swagger"
+        >
+          Swagger Api
+          <div class="node">Đã làm</div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

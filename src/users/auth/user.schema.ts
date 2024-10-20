@@ -11,7 +11,7 @@ export class User {
   username: string;
 
   @Prop({ required: true })
-  password: string; // để từ từ hash
+  password: string;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
