@@ -1,7 +1,4 @@
-// export class LoginUserDto {
-//   username: string;
-//   password: string;
-// } // nêú không dùng swagger thì dto như v v
+import { IsString, IsNotEmpty } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class LoginUserDto {
@@ -9,11 +6,14 @@ export class LoginUserDto {
     description: 'Tên đăng nhập của người dùng',
     example: 'user123',
   })
+  @IsString()
+  @IsNotEmpty()
   username: string;
 
   @ApiProperty({
     description: 'Mật khẩu của người dùng',
     example: 'password123',
   })
+  @IsNotEmpty()
   password: string;
 }

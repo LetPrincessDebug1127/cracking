@@ -1,30 +1,36 @@
-import { Module, Logger } from '@nestjs/common';
-import { ServeStaticModule } from '@nestjs/serve-static';
-import { join } from 'path';
+import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'path';
+
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { UsersModule } from './users/auth/users.module';
+import { UsersService } from './users/auth/users.service';
+import { JwtModule } from '@nestjs/jwt';
+import { JwtStrategy } from './users/auth/jwt.strategy';
 
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
+
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, '..', 'public'),
       serveRoot: '/',
     }),
+
     MongooseModule.forRootAsync({
       imports: [ConfigModule],
-      useFactory: async (configService: ConfigService) => {
-        const uri = configService.get<string>('MONGO_URI');
-        Logger.log(`Connecting to MongoDB at URI: ${uri}`, 'MongoDBConnection');
-        return { uri };
-      },
+      useFactory: (configService: ConfigService) => ({
+        uri: configService.get<string>('MONGO_URI'),
+      }),
       inject: [ConfigService],
     }),
+
     UsersModule,
   ],
+
   controllers: [AppController],
   providers: [AppService],
 })

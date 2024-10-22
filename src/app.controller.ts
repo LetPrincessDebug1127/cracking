@@ -1,26 +1,23 @@
-import { Controller, Get, Query, Post } from '@nestjs/common';
-import { ApiTags, ApiResponse } from '@nestjs/swagger';
+import { Controller, Get, Query, Post, UseGuards } from '@nestjs/common';
+import { ApiTags, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
 import { AppService } from './app.service';
+import { JwtAuthGuard } from './users/auth/jwt-auth.guard';
 
 @ApiTags('game')
 @Controller('game')
 export class AppController {
   constructor(private readonly appService: AppService) {}
 
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
   @Post('guess')
-  @ApiResponse({ status: 200, description: 'Chúc mừng người chơi nếu đúng số' })
-  @ApiResponse({ status: 400, description: 'Nếu dự đoán sai' })
-  guess(
-    @Query('number') number: string,
-    @Query('username') username: string,
-  ): string {
+  async guess(@Query('number') number: string): Promise<string> {
     const userGuess = parseInt(number, 10);
     if (isNaN(userGuess)) {
       return 'Vui lòng nhập một số hợp lệ.';
     }
-    return this.appService.guessNumber(userGuess, username); // Gửi username vào service
+    return this.appService.guessNumber(userGuess, 'authenticatedUser');
   }
-
   @Get('current-number')
   @ApiResponse({ status: 200, description: 'Lấy số hiện tại.' })
   getCurrentNumber(): number {
