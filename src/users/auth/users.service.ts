@@ -114,7 +114,6 @@ export class UsersService {
       { $set: { 'refreshTokens.$.isActive': false } },
     );
   }
-
   async getAllUsers(): Promise<User[]> {
     return this.userModel.find().exec();
   }
