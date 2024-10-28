@@ -51,7 +51,7 @@ export class UsersController {
       loginUserDto.username,
       loginUserDto.password,
     );
-
+    // bên register nó chỉ có 2 errors là existing account hoặc ko đúng định dạng dto thôi, mà existing bên service xử lý rồi con data khớp dto thì controller nhận type đầu vào
     if (!user) {
       throw new UnauthorizedException('Invalid username or password');
     }

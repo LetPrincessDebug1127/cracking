@@ -18,12 +18,7 @@ export class UsersService {
     private jwtService: JwtService,
   ) {}
 
-  async generateToken(username: string): Promise<string> {
-    const payload = { username };
-    return this.jwtService.sign(payload);
-  }
-
-  async register(createUserDto: CreateUserDto): Promise<any> {
+  async register(createUserDto: CreateUserDto): Promise<string> {
     const { username, password } = createUserDto;
 
     const existingUser = await this.userModel.findOne({ username });
@@ -31,22 +26,17 @@ export class UsersService {
       throw new BadRequestException('Tài khoản đã tồn tại');
     }
 
-    // Mã hóa mật khẩu
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Tạo người dùng mới
     const newUser = new this.userModel({
       username,
       password: hashedPassword,
     });
     await newUser.save();
 
-    const payload = { username: newUser.username, sub: newUser._id };
-    const token = this.jwtService.sign(payload);
-    const refreshToken = this.jwtService.sign(payload, { expiresIn: '7d' });
-
-    return { access_token: token, refresh_token: refreshToken };
+    return `Chúc mừng ${newUser.username}, bạn đã đăng ký thành công!`;
   }
+
   // Login and generate OTP
   async validateUser(username: string, password: string): Promise<any> {
     const user = await this.userModel.findOne({ username });
@@ -63,14 +53,12 @@ export class UsersService {
 
       const payload = { username: user.username, sub: user._id };
 
-      // Generate access token
       const accessToken = this.jwtService.sign(payload, { expiresIn: '15m' });
 
-      // Generate refresh token
       const refreshToken = this.jwtService.sign(payload, { expiresIn: '7d' });
 
       return {
-        message: 'OTP generated and sent to the user',
+        message: 'OTP đã được gửi đến bạn ♡',
         otp,
         access_token: accessToken,
         refresh_token: refreshToken,
@@ -78,7 +66,7 @@ export class UsersService {
     }
     return null;
   }
-  // Verify OTP
+  // sẽ sửa type any thành string sau
   async verifyOtp(username: string, otp: string): Promise<any> {
     const user = await this.userModel.findOne({ username });
     if (!user || !user.otp || !user.otpExpires) {
@@ -107,8 +95,8 @@ export class UsersService {
     }
   }
 
+  // async func này dùng để DI vào refresh token service bên file khác.
   async invalidateRefreshToken(refreshToken: string): Promise<void> {
-    // Giả sử bạn có trường `refreshTokens` trong User schema để lưu trữ refresh tokens
     await this.userModel.updateOne(
       { 'refreshTokens.token': refreshToken },
       { $set: { 'refreshTokens.$.isActive': false } },

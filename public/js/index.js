@@ -6,23 +6,27 @@ const gameSection = document.getElementById('gameSection');
 const registrationForm = document.getElementById('registrationForm');
 const loginForm = document.getElementById('loginForm');
 const registrationPrompt = document.getElementById('registrationPrompt');
+const loginWGG = document.getElementById('loginwithGG');
 
 // Người dùng chọn "Có" cho câu hỏi "Có muốn đăng ký tài khoản không"
 document.getElementById('registerYes').addEventListener('click', () => {
   registrationPrompt.style.display = 'none'; // Ẩn prompt đăng ký
   registrationForm.style.display = 'block'; // Hiện form đăng ký
+  loginWGG.style.display = 'none';
 });
 
 // Xử lý khi người dùng chọn "Không"
 document.getElementById('registerNo').addEventListener('click', () => {
   registrationPrompt.style.display = 'none'; // Ẩn prompt đăng ký
   startButton.style.display = 'block'; // Hiện nút bắt đầu trò chơi
+  loginWGG.style.display = 'none';
 });
 
 // Xử lý khi người dùng nhấn "Tôi đã có tài khoản"
 document.getElementById('loginLink').addEventListener('click', () => {
   registrationPrompt.style.display = 'none'; // Ẩn prompt đăng ký
   loginForm.style.display = 'block'; // Hiện form đăng nhập
+  loginWGG.style.display = 'none';
 });
 
 // Xử lý khi người dùng nhấn nút đăng ký
@@ -45,6 +49,7 @@ document
       alert('Đăng ký thành công!'); // Hiển thị thông báo thành công
       startButton.style.display = 'block'; // Hiện nút bắt đầu trò chơi
       registrationForm.style.display = 'none'; // Ẩn form đăng ký
+      loginWGG.style.display = 'none';
     } else {
       const error = await response.json();
       alert('Đăng ký thất bại: ' + error.message); // Hiển thị lỗi từ server
@@ -70,6 +75,8 @@ document.getElementById('loginButton').addEventListener('click', async () => {
     alert(data.message);
     startButton.style.display = 'block';
     loginForm.style.display = 'none';
+    loginWGG.style.display = 'none';
+
     sessionStorage.setItem('username', username); // Lưu tên người dùng vào session
   } else {
     const error = await response.json();
@@ -81,6 +88,7 @@ startButton.addEventListener('click', () => {
   messageDiv.innerText = 'Trò chơi đang bắt đầu...';
   gameSection.style.display = 'block';
   startButton.style.display = 'none';
+  loginWGG.style.display = 'none';
 });
 
 guessButton.addEventListener('click', async () => {
@@ -119,4 +127,5 @@ logoutButton.addEventListener('click', () => {
   gameSection.style.display = 'none';
   startButton.style.display = 'block';
   findMore.style.display = 'block';
+  loginWGG.style.display = 'none';
 });

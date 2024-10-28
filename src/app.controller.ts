@@ -3,7 +3,7 @@ import { ApiTags, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
 import { AppService } from './app.service';
 import { JwtAuthGuard } from './users/auth/jwt-auth.guard';
 
-@ApiTags('game')
+@ApiTags('game-logIn-ToPlay')
 @Controller('game')
 export class AppController {
   constructor(private readonly appService: AppService) {}

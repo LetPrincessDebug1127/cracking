@@ -5,6 +5,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Câu Hỏi - Trò Chơi Đoán Số</title>
     <link rel="stylesheet" href="./css/index.css" />
+    <!-- <script type="module" src="./js/firebase-config.js" defer></script>
+    <script type="module" src="./js/login-firebase.js" defer></script> -->
+    <script
+      defer
+      type="module"
+      src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js"
+    ></script>
+    <script
+      defer
+      type="module"
+      src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js"
+    ></script>
+    <script defer src="./js/index.js"></script>
+    <script type="module" defer src="./js/firebase-config.js"></script>
   </head>
   <body>
     <img src="img/my-pig.png" alt="heo-con" class="running-pig" />
@@ -18,6 +32,7 @@
       <!-- Hoặc user đã có account rồi -->
       <a id="loginLink">Tôi đã có tài khoản</a>
     </div>
+    <a id="loginwithGG">Tôi muốn đăng nhập thông qua Google</a>
 
     <!-- Form đăng ký tài khoản -->
     <div id="registrationForm">
@@ -46,7 +61,5 @@
       Đổi ý muốn chơi không cần đăng nhập - Đăng xuất
     </button>
     <!-- <a id="find-more" style="display: none">Những khái niệm đã sử dụng</a> -->
-
-    <script src="./js/index.js"></script>
   </body>
 </html>

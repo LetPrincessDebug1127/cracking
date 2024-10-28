@@ -85,6 +85,13 @@ button {
   cursor: pointer;
   color: blue;
 }
+#loginwithGG {
+  display: block;
+  margin-top: 10px;
+  cursor: pointer;
+  color: red;
+  margin-top: 12px;
+}
 #logoutButton {
   border: none;
   color: blue;
