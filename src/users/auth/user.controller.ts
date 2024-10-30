@@ -18,11 +18,13 @@ import { UsersService } from './users.service';
 import { JwtAuthGuard } from './jwt-auth.guard';
 import { CreateUserDto } from './register.dto';
 import { LoginUserDto } from './login.dto';
+import { SecurityAnswerUserDto } from './security.answer.dto';
 
 import { JwtRefreshTokenGuard } from './jwt-refresh-token.guard';
 import { Request } from 'express';
 import { AuthService } from './refreshToken.service';
 import { RefreshTokenDto } from './refresh-token.dto';
+import { ResetPasswordDto } from './reset-password.dto';
 
 @ApiTags('users')
 @Controller('users')
@@ -57,6 +59,34 @@ export class UsersController {
     }
 
     return user;
+  }
+  @Post('get-otp-forget-password')
+  @ApiOperation({ summary: 'Get OTP by providing a security answer' })
+  @ApiResponse({ status: 200, description: 'OTP sent successfully.' })
+  @ApiResponse({ status: 401, description: 'Invalid security answer.' })
+  async getOTP(@Body() securityAnswerUserDto: SecurityAnswerUserDto) {
+    const result = await this.usersService.getOtp(
+      securityAnswerUserDto.username,
+      securityAnswerUserDto.securityAnswer,
+    );
+
+    if (!result) {
+      throw new UnauthorizedException('Câu trả lời không chính xác');
+    }
+
+    return {
+      message: 'OTP đã được gửi đến bạn ♡',
+      otp: result.otp,
+    };
+  }
+  @Post('reset-password')
+  @ApiOperation({ summary: 'Reset user password' })
+  @ApiResponse({ status: 200, description: 'Password reset successfully.' })
+  @ApiResponse({ status: 401, description: 'User not found.' })
+  @ApiResponse({ status: 400, description: 'Invalid security answer.' })
+  async resetPassword(@Body() resetPasswordDto: ResetPasswordDto) {
+    const message = await this.usersService.resetPassword(resetPasswordDto);
+    return { message };
   }
   @Post('verify-otp')
   @ApiOperation({ summary: 'Verify OTP for a user' })

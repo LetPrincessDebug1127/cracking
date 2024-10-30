@@ -14,6 +14,12 @@ export class User extends Document {
 
   @Prop()
   otpExpires: Date;
+
+  @Prop({ required: true })
+  answer_security: string;
+
+  @Prop({ default: null })
+  lastOtpRequest: Date;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
