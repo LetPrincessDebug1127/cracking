@@ -18,6 +18,6 @@ export class JwtRefreshTokenStrategy extends PassportStrategy(
   }
 
   async validate(payload: any) {
-    return payload; // Trả về (username, sub)
+    return payload;
   }
 }

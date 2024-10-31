@@ -34,11 +34,12 @@ export class UsersService {
       username,
       password: hashedPassword,
       answer_security: hashedAnswer,
+      role: 'user',
     });
 
     await newUser.save();
 
-    return `Chúc mừng ${newUser.username}, bạn đã đăng ký thành công!`;
+    return `Chúc mừng ${newUser.username}, bạn đã đăng ký thành công với vai trò user!`;
   }
 
   // Đăng nhập
@@ -46,7 +47,11 @@ export class UsersService {
     const user = await this.userModel.findOne({ username });
 
     if (user && (await bcrypt.compare(password, user.password))) {
-      const payload = { username: user.username, sub: user._id };
+      const payload = {
+        username: user.username,
+        sub: user._id,
+        role: user.role,
+      };
 
       const accessToken = this.jwtService.sign(payload, { expiresIn: '15m' });
       const refreshToken = this.jwtService.sign(payload, { expiresIn: '7d' });
@@ -59,6 +64,7 @@ export class UsersService {
 
     return null;
   }
+
   // LẤY MÃ Ô TÊ PÊ
   async getOtp(
     username: string,
@@ -171,5 +177,29 @@ export class UsersService {
     await user.save();
 
     return 'Mật khẩu của bạn đã được thay đổi thành công!';
+  }
+
+  // Tạo admin
+
+  async createAdmin(createUserDto: CreateUserDto): Promise<string> {
+    const { username, password, securityAnswer } = createUserDto;
+
+    const existingUser = await this.userModel.findOne({ username });
+    if (existingUser) {
+      throw new BadRequestException('Tài khoản đã tồn tại');
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const hashedAnswer = await bcrypt.hash(securityAnswer.toString(), 10);
+
+    const newUser = new this.userModel({
+      username,
+      password: hashedPassword,
+      answer_security: hashedAnswer,
+      role: 'admin', // Đặt role là admin
+    });
+    await newUser.save();
+
+    return `Chúc mừng ${newUser.username}, bạn đã được tạo thành công với vai trò admin!`;
   }
 }

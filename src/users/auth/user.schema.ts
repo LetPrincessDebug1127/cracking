@@ -20,6 +20,9 @@ export class User extends Document {
 
   @Prop({ default: null })
   lastOtpRequest: Date;
+
+  @Prop({ default: 'user' })
+  role: string;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
