@@ -35,18 +35,29 @@ export class UsersController {
   ) {}
 
   @Post('register')
-  @ApiOperation({ summary: 'Register a new user' })
-  @ApiResponse({ status: 201, description: 'User successfully registered' })
-  @ApiResponse({ status: 400, description: 'Bad request' })
+  @ApiOperation({ summary: 'Đăng ký' })
+  @ApiResponse({
+    status: 201,
+    description: 'Đăng ký thành công với vai trò user',
+  })
+  @ApiResponse({
+    status: 400,
+    description:
+      'Đăng ký thất bại vì các lí do : tài khoản hoặc mật khẩu ít hơn 5 kí tự, không có kí tự đặc biệt, tài khoản trùng lặp',
+  })
   @ApiBody({ type: CreateUserDto })
   async register(@Body() createUserDto: CreateUserDto) {
     return this.usersService.register(createUserDto);
   }
 
   @Post('login')
-  @ApiOperation({ summary: 'Log in a user' })
-  @ApiResponse({ status: 200, description: 'User successfully logged in' })
-  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @ApiOperation({ summary: 'Đăng nhập' })
+  @ApiResponse({ status: 200, description: 'Đăng nhập thành công' })
+  @ApiResponse({
+    status: 401,
+    description:
+      'Đăng nhập thất bại vì các lí do: tài khoản không tồn tại, tài khoản bị khóa vì đăng nhập thất bại quá nhiều lần',
+  })
   @ApiBody({ type: LoginUserDto })
   async login(@Body() loginUserDto: LoginUserDto) {
     const user = await this.usersService.validateUser(

@@ -14,6 +14,12 @@ import { ResetPasswordDto } from './reset-password.dto'; // Import the DTO
 
 @Injectable()
 export class UsersService {
+  private failedAttempts = new Map<
+    string,
+    { attempts: number; blockUntil: Date }
+  >();
+  private readonly MAX_ATTEMPTS = 5;
+  private readonly BLOCK_DURATION = 5 * 60 * 1000; // 5 minutes
   constructor(
     @InjectModel(User.name) private userModel: Model<User>,
     private jwtService: JwtService,
@@ -21,6 +27,15 @@ export class UsersService {
 
   async register(createUserDto: CreateUserDto): Promise<string> {
     const { username, password, securityAnswer } = createUserDto;
+
+    const usernameRegex = /^.{5,}$/;
+    const passwordRegex = /^(?=.*[A-Z])(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{5,}$/;
+
+    if (!usernameRegex.test(username) || !passwordRegex.test(password)) {
+      throw new BadRequestException(
+        'Tên tài khoản phải có ít nhất 5 ký tự, và mật khẩu phải có ít nhất 5 ký tự, bao gồm một chữ cái viết hoa và một ký tự đặc biệt.',
+      );
+    }
 
     const existingUser = await this.userModel.findOne({ username });
     if (existingUser) {
@@ -42,17 +57,29 @@ export class UsersService {
     return `Chúc mừng ${newUser.username}, bạn đã đăng ký thành công với vai trò user!`;
   }
 
-  // Đăng nhập
   async validateUser(username: string, password: string): Promise<any> {
+    const MAX_ATTEMPTS = 5;
+    const BLOCK_DURATION = 5 * 60 * 1000;
+    const now = new Date();
+
+    let userAttemptData = this.failedAttempts.get(username);
+
+    if (userAttemptData && userAttemptData.blockUntil > now) {
+      throw new BadRequestException(
+        `Tài khoản ${username} bị tạm khóa do nhập sai quá nhiều lần. Vui lòng thử lại sau 5 phút.`,
+      );
+    }
+
     const user = await this.userModel.findOne({ username });
 
     if (user && (await bcrypt.compare(password, user.password))) {
+      this.failedAttempts.delete(username);
+
       const payload = {
         username: user.username,
         sub: user._id,
         role: user.role,
       };
-
       const accessToken = this.jwtService.sign(payload, { expiresIn: '15m' });
       const refreshToken = this.jwtService.sign(payload, { expiresIn: '7d' });
 
@@ -60,9 +87,21 @@ export class UsersService {
         access_token: accessToken,
         refresh_token: refreshToken,
       };
-    }
+    } else {
+      if (!userAttemptData) {
+        userAttemptData = { attempts: 1, blockUntil: null };
+      } else {
+        userAttemptData.attempts += 1;
+      }
 
-    return null;
+      if (userAttemptData.attempts >= MAX_ATTEMPTS) {
+        userAttemptData.blockUntil = new Date(now.getTime() + BLOCK_DURATION);
+      }
+
+      this.failedAttempts.set(username, userAttemptData);
+
+      throw new BadRequestException('Tên tài khoản hoặc mật khẩu không đúng');
+    }
   }
 
   // LẤY MÃ Ô TÊ PÊ

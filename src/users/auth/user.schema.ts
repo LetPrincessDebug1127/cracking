@@ -23,6 +23,12 @@ export class User extends Document {
 
   @Prop({ default: 'user' })
   role: string;
+
+  @Prop({ default: 0 })
+  failedLoginAttempts: number;
+
+  @Prop({ default: null })
+  lockUntil: Date | null;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
