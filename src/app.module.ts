@@ -8,6 +8,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { UsersModule } from './users/auth/users.module';
 import { AuthModule } from './firebase/firebase.module';
+import { PostsModule } from './posts/posts.module';
 
 @Module({
   imports: [
@@ -28,9 +29,10 @@ import { AuthModule } from './firebase/firebase.module';
 
     UsersModule,
     AuthModule,
+    PostsModule,
   ],
 
   controllers: [AppController],
-  providers: [AppService, AuthModule],
+  providers: [AppService, AuthModule, PostsModule],
 })
 export class AppModule {}

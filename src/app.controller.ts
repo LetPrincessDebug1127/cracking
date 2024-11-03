@@ -1,4 +1,11 @@
-import { Controller, Get, Query, Post, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Query,
+  Post,
+  UseGuards,
+  Request,
+} from '@nestjs/common';
 import { ApiTags, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
 import { AppService } from './app.service';
 import { JwtAuthGuard } from './users/auth/jwt-auth.guard';
@@ -15,12 +22,18 @@ export class AppController {
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   @Post('guess')
-  async guess(@Query('number') number: string): Promise<string> {
+  async guess(
+    @Query('number') number: string,
+    @Request() req,
+  ): Promise<string> {
     const userGuess = parseInt(number, 10);
     if (isNaN(userGuess)) {
       return 'Vui lòng nhập một số hợp lệ.';
     }
-    return this.appService.guessNumber(userGuess, 'authenticatedUser');
+
+    // Lấy username từ req.user
+    const username = req.user.username; // Giả sử req.user chứa username
+    return this.appService.guessNumber(userGuess, username);
   }
   @Get('current-number')
   @ApiBearerAuth()

@@ -8,18 +8,20 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import * as bcrypt from 'bcrypt';
 import * as speakeasy from 'speakeasy';
-import { User } from './user.schema';
+import { User } from '../../models/user.schema';
 import { CreateUserDto } from './register.dto';
-import { ResetPasswordDto } from './reset-password.dto'; // Import the DTO
+import { ResetPasswordDto } from './reset-password.dto';
 
 @Injectable()
 export class UsersService {
+  // tạo một ctdl để lưu username và số lần ng đó đăng nhập thất bại, cũng như là khi nào người đó được unblock
+  // mình dùng Map() là một data structure của js để lưu cặp key value nó cung cấp các method như get và set để lấy ra và thay đổi value của key
   private failedAttempts = new Map<
     string,
     { attempts: number; blockUntil: Date }
   >();
   private readonly MAX_ATTEMPTS = 5;
-  private readonly BLOCK_DURATION = 5 * 60 * 1000; // 5 minutes
+  private readonly BLOCK_DURATION = 5 * 60 * 1000;
   constructor(
     @InjectModel(User.name) private userModel: Model<User>,
     private jwtService: JwtService,
@@ -33,7 +35,7 @@ export class UsersService {
 
     if (!usernameRegex.test(username) || !passwordRegex.test(password)) {
       throw new BadRequestException(
-        'Tên tài khoản phải có ít nhất 5 ký tự, và mật khẩu phải có ít nhất 5 ký tự, bao gồm một chữ cái viết hoa và một ký tự đặc biệt.',
+        'Tài khoản & mật khẩu phải có ít nhất 5 ký tự, bao gồm một chữ cái viết hoa và một ký tự đặc biệt.',
       );
     }
 
@@ -62,6 +64,7 @@ export class UsersService {
     const BLOCK_DURATION = 5 * 60 * 1000;
     const now = new Date();
 
+    // Map() lúc này chưa có username mà get() thì nó return undefined => lúc này userAttemptData sẽ falsy
     let userAttemptData = this.failedAttempts.get(username);
 
     if (userAttemptData && userAttemptData.blockUntil > now) {
