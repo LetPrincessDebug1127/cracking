@@ -51,4 +51,12 @@ export class PostService {
 
     return await post.save(); // Save changes to the post
   }
+
+  async getLikesCount(postId: Types.ObjectId): Promise<number> {
+    const getLike_post = await this.postModel.findById(postId);
+    if (!getLike_post) {
+      throw new NotFoundException('ID bài post không đúng, không tìm thấy');
+    }
+    return getLike_post.likes;
+  }
 }

@@ -9,10 +9,10 @@ import {
 import { ApiTags, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
 import { AppService } from './app.service';
 import { JwtAuthGuard } from './users/auth/jwt-auth.guard';
-import { RolesGuard } from './users/auth/role-admin/roles'; // Giả định bạn có guard cho vai trò
+import { RolesGuard } from './users/auth/role-admin/roles';
 import { UserRole } from './users/auth/role-admin/user-role.enum';
 
-import { Roles } from './users/auth/role-admin/role.decorator'; // Adjust the import path accordingly
+import { Roles } from './users/auth/role-admin/role.decorator';
 
 @ApiTags('game-logIn-ToPlay')
 @Controller('game')
