@@ -40,16 +40,14 @@ export class PostService {
     const userIndex = post.likedBy.indexOf(userId);
 
     if (userIndex === -1) {
-      // User hasn't liked the post yet, so we add them
       post.likedBy.push(userId);
-      post.likes += 1; // Increase likes count
+      post.likes += 1;
     } else {
-      // User has already liked the post, so we remove them
       post.likedBy.splice(userIndex, 1);
-      post.likes -= 1; // Decrease likes count
+      post.likes -= 1;
     }
 
-    return await post.save(); // Save changes to the post
+    return await post.save();
   }
 
   async getLikesCount(postId: Types.ObjectId): Promise<number> {
