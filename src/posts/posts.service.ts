@@ -5,11 +5,14 @@ import { Post } from '../models/posts.schema';
 import { CreatePostDto } from '../dto.all.ts/create-post.dto';
 import { JwtService } from '@nestjs/jwt';
 import { Types } from 'mongoose';
+import { User } from '../models/user.schema';
 
 @Injectable()
 export class PostService {
   constructor(
     @InjectModel(Post.name) private readonly postModel: Model<Post>,
+    @InjectModel(User.name) private userModel: Model<User>,
+
     private readonly jwtService: JwtService,
   ) {}
 
@@ -58,5 +61,29 @@ export class PostService {
       throw new NotFoundException('ID bài post không đúng, không tìm thấy');
     }
     return getLike_post.likes;
+  }
+  // mới đầu dùng if else lồng nhau xấu quá nên đổi qua if kiểu này, nhìn vẫn tệ:((
+  async deletePost(userId: Types.ObjectId, postId: Types.ObjectId) {
+    const user = await this.userModel.findById(userId);
+    const post = await this.postModel.findById(postId);
+
+    if (!user) {
+      throw new NotFoundException('Người dùng không tồn tại');
+    }
+    if (!post) {
+      throw new NotFoundException('Bài viết không tồn tại');
+    }
+
+    if (user.role === 'admin') {
+      await this.postModel.findByIdAndDelete(postId);
+      return 'Bài viết đã được xóa bởi admin';
+    }
+
+    if (!post.likedBy.includes(userId)) {
+      return 'Bạn không có quyền sở hữu để xóa bài viết';
+    }
+
+    await this.postModel.findByIdAndDelete(postId);
+    return 'Bài viết đã được xóa';
   }
 }
