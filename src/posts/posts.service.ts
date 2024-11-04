@@ -36,7 +36,7 @@ export class PostService {
     if (!post) {
       throw new NotFoundException('Post not found');
     }
-
+    //likeBy mình define bên schema là array, dùng indexOf để check index của user này coi họ có like chưa thì nếu ko tìm thấy nó sẽ trả về -1
     const userIndex = post.likedBy.indexOf(userId);
 
     if (userIndex === -1) {
