@@ -34,7 +34,9 @@ export class PostService {
     const post = await this.postModel.findById(postId);
 
     if (!post) {
-      throw new NotFoundException('Post not found');
+      throw new NotFoundException(
+        'Không tìm thấy bài viết. Có vẻ id không đúng',
+      );
     }
     //likeBy mình define bên schema là array, dùng indexOf để check index của user này coi họ có like chưa thì nếu ko tìm thấy nó sẽ trả về -1
     const userIndex = post.likedBy.indexOf(userId);
