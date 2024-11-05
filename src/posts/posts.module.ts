@@ -6,10 +6,12 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { PostController } from './posts.controller';
 import { PostService } from './posts.service';
 import { Post, PostSchema } from '../models/posts.schema';
+import { User, UserSchema } from '../models/user.schema';
 
 @Module({
   imports: [
     MongooseModule.forFeature([{ name: Post.name, schema: PostSchema }]),
+    MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
     ConfigModule,
     JwtModule.registerAsync({
       imports: [ConfigModule],
@@ -20,6 +22,7 @@ import { Post, PostSchema } from '../models/posts.schema';
       inject: [ConfigService],
     }),
   ],
+
   controllers: [PostController],
   providers: [PostService],
   exports: [PostService],

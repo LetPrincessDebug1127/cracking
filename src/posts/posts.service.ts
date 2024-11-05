@@ -41,7 +41,6 @@ export class PostService {
         'Không tìm thấy bài viết. Có vẻ id không đúng',
       );
     }
-    //likeBy mình define bên schema là array, dùng indexOf để check index của user này coi họ có like chưa thì nếu ko tìm thấy nó sẽ trả về -1
     const userIndex = post.likedBy.indexOf(userId);
 
     if (userIndex === -1) {
@@ -62,7 +61,7 @@ export class PostService {
     }
     return getLike_post.likes;
   }
-  // mới đầu dùng if else lồng nhau xấu quá nên đổi qua if kiểu này, nhìn vẫn tệ:((
+
   async deletePost(userId: Types.ObjectId, postId: Types.ObjectId) {
     const user = await this.userModel.findById(userId);
     const post = await this.postModel.findById(postId);

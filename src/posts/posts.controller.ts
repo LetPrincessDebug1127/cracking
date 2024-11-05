@@ -7,6 +7,7 @@ import {
   Param,
   Get,
   BadRequestException,
+  Delete,
 } from '@nestjs/common';
 import { PostService } from './posts.service';
 import { JwtAuthGuard } from '../users/auth/jwt-auth.guard';
@@ -72,5 +73,24 @@ export class PostController {
 
     const likes = await this.postService.getLikesCount(post_Id);
     return { message: `Bài viết này có tổng cộng ${likes} likes.` };
+  }
+
+  @Delete(':id/delete-post')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
+  @ApiBearerAuth()
+  @ApiResponse({
+    status: 201,
+    description: 'Đã xóa bài post thành công',
+  })
+  @ApiResponse({
+    status: 401,
+    description:
+      'Bạn phải dùng tài khoản Admin hoặc là User sỡ hữu bài viết mới xóa được',
+  })
+  async deletePost(@Request() req, @Param('id') postId: string) {
+    const post_Id = new Types.ObjectId(postId);
+    const user_Id = req.user.userId;
+    return this.postService.deletePost(user_Id, post_Id);
   }
 }
