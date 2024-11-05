@@ -108,8 +108,34 @@ export class PostService {
       postId: post_Id,
     });
     const savedComment = await newComment.save();
+    post_Id.comments.push(savedComment._id as Types.ObjectId);
+    await post_Id.save();
     return {
       commentId: savedComment._id.toString(),
     };
+  }
+
+  async deleteComment(userId: Types.ObjectId, commentId: Types.ObjectId) {
+    const user = await this.userModel.findById(userId);
+    if (!user) {
+      throw new NotFoundException('Người dùng không tồn tại');
+    }
+
+    const comment = await this.commentModel.findById(commentId);
+    if (!comment) {
+      throw new NotFoundException('Bình luận không tồn tại');
+    }
+
+    if (user.role === 'admin') {
+      await this.commentModel.findByIdAndDelete(commentId);
+      return 'Comment đã bị xóa bởi Admin';
+    }
+
+    if (comment.author.equals(userId)) {
+      await this.commentModel.findByIdAndDelete(commentId);
+      return 'Comment đã bị xóa';
+    } else {
+      return 'Bạn không phải tác giả của comment này, không có quyền xóa.';
+    }
   }
 }
