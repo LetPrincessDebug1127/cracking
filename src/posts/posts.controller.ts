@@ -127,4 +127,22 @@ export class PostController {
     }
     return this.postService.createComment(user_Id, post_Id, contentComment);
   }
+
+  @Delete(':id/delete-comment')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiResponse({
+    status: 201,
+    description: 'Đã xóa bài comment thành công',
+  })
+  @ApiResponse({
+    status: 401,
+    description:
+      'Bạn phải dùng tài khoản Admin hoặc là User sỡ hữu comment mới xóa được',
+  })
+  async deleteComment(@Request() req, @Param('id') commentId: string) {
+    const user = req.user.userId;
+    const comment = new Types.ObjectId(commentId);
+    return this.postService.deleteComment(user, comment);
+  }
 }
