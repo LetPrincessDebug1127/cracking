@@ -162,7 +162,7 @@ export class PostController {
     @Param('id') postId: string,
   ): Promise<{ message: string }> {
     const post_Id = new Types.ObjectId(postId);
-    const total = this.postService.commentsCount(post_Id);
+    const total = await this.postService.commentsCount(post_Id);
     return { message: `Bài viết này có tổng cộng ${total} bình luận` };
   }
 }
