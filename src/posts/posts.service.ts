@@ -12,6 +12,7 @@ export class PostService {
   constructor(
     @InjectModel(Post.name) private readonly postModel: Model<Post>,
     @InjectModel(User.name) private userModel: Model<User>,
+    @InjectModel(Comment.name) private commentModel: Model<Comment>,
 
     private readonly jwtService: JwtService,
   ) {}
@@ -62,6 +63,8 @@ export class PostService {
     return getLike_post.likes;
   }
 
+  // hàm này mình không trả về Promise vì mình toString() ở return nên TS dự đoán được kiểu
+
   async deletePost(userId: Types.ObjectId, postId: Types.ObjectId) {
     const user = await this.userModel.findById(userId);
     const post = await this.postModel.findById(postId);
@@ -84,5 +87,28 @@ export class PostService {
 
     await this.postModel.findByIdAndDelete(postId);
     return 'Bài viết đã được xóa';
+  }
+
+  // hàm này mình không trả về Promise vì mình toString() ở return nên TS dự đoán được kiểu
+
+  async createComment(
+    userId: Types.ObjectId,
+    postId: Types.ObjectId,
+    createPostDto: CreatePostDto,
+  ) {
+    const post_Id = await this.postModel.findById(postId);
+    const user_Id = await this.userModel.findById(userId);
+    if (!post_Id) {
+      throw new NotFoundException('Bài viết không tồn tại');
+    }
+    const newComment = new this.commentModel({
+      content: createPostDto.content,
+      author: user_Id,
+      postId: post_Id,
+    });
+    const savedComment = await newComment.save();
+    return {
+      commentId: savedComment._id.toString(),
+    };
   }
 }

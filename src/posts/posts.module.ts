@@ -7,11 +7,14 @@ import { PostController } from './posts.controller';
 import { PostService } from './posts.service';
 import { Post, PostSchema } from '../models/posts.schema';
 import { User, UserSchema } from '../models/user.schema';
+import { Comment, CommentSchema } from '../models/comments.schema';
 
 @Module({
   imports: [
     MongooseModule.forFeature([{ name: Post.name, schema: PostSchema }]),
     MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
+    MongooseModule.forFeature([{ name: Comment.name, schema: CommentSchema }]),
+
     ConfigModule,
     JwtModule.registerAsync({
       imports: [ConfigModule],

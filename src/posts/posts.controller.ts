@@ -7,6 +7,7 @@ import {
   Param,
   Get,
   BadRequestException,
+  NotFoundException,
   Delete,
 } from '@nestjs/common';
 import { PostService } from './posts.service';
@@ -92,5 +93,30 @@ export class PostController {
     const post_Id = new Types.ObjectId(postId);
     const user_Id = req.user.userId;
     return this.postService.deletePost(user_Id, post_Id);
+  }
+
+  @Post(':id/create-comment')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiResponse({
+    status: 201,
+    description: 'Đã comment thành công',
+  })
+  @ApiResponse({
+    status: 401,
+    description: 'Vui lòng đăng nhập để comment',
+  })
+  async createComment(
+    @Param('id') postId: string,
+    @Request() req,
+    @Body() createPostDto: CreatePostDto,
+  ) {
+    const post_Id = new Types.ObjectId(postId);
+    const user_Id = req.user.userId;
+    const contentComment = createPostDto;
+    if (!contentComment.content) {
+      throw new BadRequestException('Nội dung comment không hợp lệ');
+    }
+    return this.postService.createComment(post_Id, user_Id, contentComment);
   }
 }

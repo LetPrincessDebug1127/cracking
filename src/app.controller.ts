@@ -14,6 +14,8 @@ import { UserRole } from './users/auth/role-admin/user-role.enum';
 
 import { Roles } from './users/auth/role-admin/role.decorator';
 
+//req.user là cơ chế đặc biệt của jwtAuthGuard, sau khi validate payload nó auto gán vào req.user luôn
+
 @ApiTags('game-logIn-ToPlay')
 @Controller('game')
 export class AppController {
