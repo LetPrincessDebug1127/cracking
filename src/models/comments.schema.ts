@@ -4,16 +4,13 @@ import { Document, Types } from 'mongoose';
 @Schema()
 export class Comment extends Document {
   @Prop({ type: Types.ObjectId, ref: 'Post', required: true })
-  postId: Types.ObjectId; // Liên kết đến Post
+  postId: Types.ObjectId;
 
   @Prop({ required: true })
   content: string;
 
   @Prop({ type: Types.ObjectId, ref: 'User', required: true })
-  author: Types.ObjectId; // Liên kết đến User
-
-  //   @Prop({ default: Date.now }) // chưa nghĩ ra tại sao cần, vì kinh phí eo hẹp nên chưa dùng
-  //   createdAt: Date;
+  author: Types.ObjectId;
 }
 
 export const CommentSchema = SchemaFactory.createForClass(Comment);
