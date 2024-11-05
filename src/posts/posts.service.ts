@@ -138,4 +138,12 @@ export class PostService {
       return 'Bạn không phải tác giả của comment này, không có quyền xóa.';
     }
   }
+
+  async commentsCount(postId: Types.ObjectId): Promise<number> {
+    const post_Id = await this.postModel.findById(postId);
+    if (!post_Id) {
+      throw new NotFoundException('Bài viết không tồn tại');
+    }
+    return post_Id.comments.length;
+  }
 }

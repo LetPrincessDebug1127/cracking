@@ -9,7 +9,7 @@ import { JwtStrategy } from './jwt.strategy';
 import { ConfigModule } from '@nestjs/config';
 import { JwtRefreshTokenStrategy } from './jwt-refresh-token.strategy.ts';
 import { AuthService } from './refreshToken.service';
-import { AdminController } from './role-admin/admin.controller'; // Adjust the path as necessary
+import { AdminController } from './role-admin/admin.controller';
 
 @Module({
   imports: [

@@ -145,4 +145,24 @@ export class PostController {
     const comment = new Types.ObjectId(commentId);
     return this.postService.deleteComment(user, comment);
   }
+
+  @Get(':id/total-comments')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
+  @ApiBearerAuth()
+  @ApiResponse({
+    status: 201,
+    description: 'Lấy tổng số comments của một bài Post thành công',
+  })
+  @ApiResponse({
+    status: 401,
+    description: 'Bạn phải dùng tài khoản Admin mới truy vấn được',
+  })
+  async getTotalComments(
+    @Param('id') postId: string,
+  ): Promise<{ message: string }> {
+    const post_Id = new Types.ObjectId(postId);
+    const total = this.postService.commentsCount(post_Id);
+    return { message: `Bài viết này có tổng cộng ${total} bình luận` };
+  }
 }

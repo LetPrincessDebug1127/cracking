@@ -25,7 +25,10 @@ import { Request } from 'express';
 import { AuthService } from './refreshToken.service';
 import { RefreshTokenDto } from './refresh-token.dto';
 import { ResetPasswordDto } from './reset-password.dto';
+import { RolesGuard } from './role-admin/roles';
+import { UserRole } from './role-admin/user-role.enum';
 
+import { Roles } from './role-admin/role.decorator';
 @ApiTags('users')
 @Controller('users')
 export class UsersController {
@@ -51,7 +54,9 @@ export class UsersController {
   }
 
   @Post('login')
-  @ApiOperation({ summary: 'Đăng nhập' })
+  @ApiOperation({
+    summary: 'Đăng nhập. Khóa tài khoản 5 phút sau 5 lần đăng nhập thất bại',
+  })
   @ApiResponse({ status: 200, description: 'Đăng nhập thành công' })
   @ApiResponse({
     status: 401,
@@ -72,7 +77,9 @@ export class UsersController {
     return user;
   }
   @Post('get-otp-forget-password')
-  @ApiOperation({ summary: 'Get OTP by providing a security answer' })
+  @ApiOperation({
+    summary: 'Lấy OTP từ security answer, bạn chỉ có thể gửi OTP mỗi 5 phút',
+  })
   @ApiResponse({ status: 200, description: 'OTP sent successfully.' })
   @ApiResponse({ status: 401, description: 'Invalid security answer.' })
   async getOTP(@Body() securityAnswerUserDto: SecurityAnswerUserDto) {
@@ -140,11 +147,16 @@ export class UsersController {
   }
 
   @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
   @ApiBearerAuth()
   @Get('all')
   @ApiOperation({ summary: 'Get all users' })
   @ApiResponse({ status: 200, description: 'List of all users' })
-  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @ApiResponse({
+    status: 401,
+    description: 'Unauthorized, allowing only Admin account.',
+  })
   async getAllUsers() {
     return this.usersService.getAllUsers();
   }
