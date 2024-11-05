@@ -6,6 +6,7 @@ import { CreatePostDto } from '../dto.all.ts/create-post.dto';
 import { JwtService } from '@nestjs/jwt';
 import { Types } from 'mongoose';
 import { User } from '../models/user.schema';
+import { Comment } from '../models/comments.schema';
 
 @Injectable()
 export class PostService {

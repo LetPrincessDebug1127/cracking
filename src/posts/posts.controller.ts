@@ -13,7 +13,13 @@ import {
 import { PostService } from './posts.service';
 import { JwtAuthGuard } from '../users/auth/jwt-auth.guard';
 import { CreatePostDto } from '../dto.all.ts/create-post.dto';
-import { ApiBody, ApiResponse, ApiTags, ApiBearerAuth } from '@nestjs/swagger';
+import {
+  ApiBody,
+  ApiResponse,
+  ApiTags,
+  ApiBearerAuth,
+  ApiParam,
+} from '@nestjs/swagger';
 import { Types } from 'mongoose';
 import { RolesGuard } from '../users/auth/role-admin/roles';
 import { UserRole } from '../users/auth/role-admin/user-role.enum';
@@ -97,6 +103,7 @@ export class PostController {
 
   @Post(':id/create-comment')
   @UseGuards(JwtAuthGuard)
+  @ApiParam({ name: 'id', description: 'ID của bài viết', type: String })
   @ApiBearerAuth()
   @ApiResponse({
     status: 201,
