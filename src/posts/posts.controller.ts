@@ -114,8 +114,9 @@ export class PostController {
     description: 'Vui lòng đăng nhập để comment',
   })
   async createComment(
-    @Param('id') postId: string,
     @Request() req,
+    @Param('id') postId: string,
+
     @Body() createPostDto: CreatePostDto,
   ) {
     const post_Id = new Types.ObjectId(postId);
@@ -124,6 +125,6 @@ export class PostController {
     if (!contentComment.content) {
       throw new BadRequestException('Nội dung comment không hợp lệ');
     }
-    return this.postService.createComment(post_Id, user_Id, contentComment);
+    return this.postService.createComment(user_Id, post_Id, contentComment);
   }
 }
