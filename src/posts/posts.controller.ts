@@ -62,9 +62,6 @@ export class PostController {
   }
 
   @Get(':id/total-likes')
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(UserRole.ADMIN)
-  @ApiBearerAuth()
   @ApiResponse({
     status: 201,
     description: 'Lấy tổng số likes của một bài Post thành công',
@@ -164,5 +161,19 @@ export class PostController {
     const post_Id = new Types.ObjectId(postId);
     const total = await this.postService.commentsCount(post_Id);
     return { message: `Bài viết này có tổng cộng ${total} bình luận` };
+  }
+
+  @Get(':id/who-likes')
+  @ApiResponse({
+    status: 201,
+    description: 'Lấy tổng số likes của một bài Post thành công',
+  })
+  @ApiResponse({
+    status: 401,
+    description: 'Bạn phải dùng tài khoản Admin mới truy vấn được',
+  })
+  async(@Param('id') postId: string) {
+    const post_Id = new Types.ObjectId(postId);
+    return this.postService.getLikesForPost(post_Id);
   }
 }

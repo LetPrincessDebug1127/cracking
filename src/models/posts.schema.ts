@@ -1,5 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
+import {User} from '../models/user.schema'
 
 @Schema()
 export class Post extends Document {
@@ -17,6 +18,9 @@ export class Post extends Document {
 
   @Prop({ type: [{ type: Types.ObjectId, ref: 'Comment' }], default: [] })
   comments: Types.ObjectId[]; // Mảng chứa các comment IDs liên kết đến bài viết
+  
 }
+
+
 
 export const PostSchema = SchemaFactory.createForClass(Post);

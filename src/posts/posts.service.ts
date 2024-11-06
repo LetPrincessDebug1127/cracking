@@ -138,12 +138,25 @@ export class PostService {
       return 'Bạn không phải tác giả của comment này, không có quyền xóa.';
     }
   }
-
+  // Chỗ này ban đầu mình bị một lỗi khá hay là quên await
   async commentsCount(postId: Types.ObjectId): Promise<number> {
     const post_Id = await this.postModel.findById(postId);
     if (!post_Id) {
       throw new NotFoundException('Bài viết không tồn tại');
     }
     return post_Id.comments.length;
+  }
+
+  async getLikesForPost(postId: Types.ObjectId): Promise<string[]> {
+    const post = await this.postModel
+      .findById(postId)
+      .populate<{ likedBy: User[] }>('likedBy', 'username') // Sử dụng type assertion tại đây
+      .exec();
+
+    if (!post) {
+      throw new NotFoundException('Bài viết không tồn tại');
+    }
+    const likedUsernames = post.likedBy.map((user) => user.username);
+    return likedUsernames;
   }
 }
