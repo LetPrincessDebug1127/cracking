@@ -21,7 +21,7 @@ export class Post extends mongoose.Document {
   likedBy: Types.ObjectId[];
 
   @Prop({
-    type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Comment' }],
+    type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
     default: [],
   })
   comments: Types.ObjectId[];

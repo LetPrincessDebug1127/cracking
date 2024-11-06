@@ -108,7 +108,9 @@ export class PostService {
       postId: post_Id,
     });
     const savedComment = await newComment.save();
-    post_Id.comments.push(savedComment._id as Types.ObjectId);
+    // chỗ này viết hơi loạn, ý là comments của post thì save userId để api khác dùng
+    //còn api này trả về id của comment, 2 này khác nhau
+    post_Id.comments.push(user_Id._id as Types.ObjectId);
     await post_Id.save();
     return {
       commentId: savedComment._id.toString(),
@@ -147,7 +149,7 @@ export class PostService {
     return post_Id.comments.length;
   }
 
-  async whoLiked(postId: Types.ObjectId): Promise<string[]> {
+  async whoLiked(postId: Types.ObjectId): Promise<string[] | string> {
     const post = await this.postModel
       .findById(postId)
       .populate<{ likedBy: User[] }>('likedBy', 'username')
@@ -156,7 +158,25 @@ export class PostService {
     if (!post) {
       throw new NotFoundException('Bài viết không tồn tại');
     }
+    if (!post.likedBy || post.likedBy.length === 0) {
+      return 'Bài viết này chưa có ai like';
+    }
     const likedUsernames = post.likedBy.map((user) => user.username);
     return likedUsernames;
+  }
+
+  // nếu sau này dùng dữ liệu lớn + thuật toán phức tạp thì mình sẽ dùng $lookup
+  async whoCommented(postId: Types.ObjectId): Promise<string[] | string> {
+    const post = await this.postModel
+      .findById(postId)
+      .populate<{ comments: User[] }>('comments', 'username');
+    if (!post) {
+      throw new NotFoundException('Bài viết không tồn tại');
+    }
+    if (!post.comments || post.comments.length === 0) {
+      return 'Bài viết này chưa có ai comment';
+    }
+    const commentedUsernames = post.comments.map((user) => user.username);
+    return commentedUsernames;
   }
 }

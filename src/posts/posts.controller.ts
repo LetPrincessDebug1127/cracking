@@ -163,7 +163,7 @@ export class PostController {
     return { message: `Bài viết này có tổng cộng ${total} bình luận` };
   }
 
-  @Get(':id/who-likes')
+  @Get(':id/who-liked')
   @ApiResponse({
     status: 201,
     description: 'Đây là danh sách những ai đã like bài viết này',
@@ -175,5 +175,19 @@ export class PostController {
   async whoLiked(@Param('id') postId: string) {
     const post_Id = new Types.ObjectId(postId);
     return this.postService.whoLiked(post_Id);
+  }
+
+  @Get(':id/who-commented')
+  @ApiResponse({
+    status: 201,
+    description: 'Đây là danh sách những ai đã comment bài viết này',
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Lấy danh sách thất bại',
+  })
+  async whoCommented(@Param('id') postId: string) {
+    const post_Id = new Types.ObjectId(postId);
+    return this.postService.whoCommented(post_Id);
   }
 }
