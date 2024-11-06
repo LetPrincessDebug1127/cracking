@@ -56,7 +56,7 @@ export class PostController {
   async likePost(@Request() req, @Param('id') postId: string) {
     const post_Id = new Types.ObjectId(postId);
 
-    const user_Id = req.user.userId;
+    const user_Id = new Types.ObjectId(req.user.userId);
 
     return this.postService.handleLikePost(user_Id, post_Id);
   }
@@ -166,14 +166,14 @@ export class PostController {
   @Get(':id/who-likes')
   @ApiResponse({
     status: 201,
-    description: 'Lấy tổng số likes của một bài Post thành công',
+    description: 'Đây là danh sách những ai đã like bài viết này',
   })
   @ApiResponse({
-    status: 401,
-    description: 'Bạn phải dùng tài khoản Admin mới truy vấn được',
+    status: 400,
+    description: 'Lấy danh sách thất bại',
   })
-  async(@Param('id') postId: string) {
+  async whoLiked(@Param('id') postId: string) {
     const post_Id = new Types.ObjectId(postId);
-    return this.postService.getLikesForPost(post_Id);
+    return this.postService.whoLiked(post_Id);
   }
 }

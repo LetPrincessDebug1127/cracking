@@ -1,26 +1,30 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document, Types } from 'mongoose';
-import {User} from '../models/user.schema'
+import * as mongoose from 'mongoose';
+import { User } from '../models/user.schema';
+import { Types } from 'mongoose';
 
 @Schema()
-export class Post extends Document {
+export class Post extends mongoose.Document {
   @Prop({ required: true })
   content: string;
 
-  @Prop({ type: Types.ObjectId, ref: 'User', required: true })
-  author: Types.ObjectId; // Liên kết đến User
+  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true })
+  author: Types.ObjectId[];
 
   @Prop({ default: 0 })
   likes: number;
 
-  @Prop({ type: [{ type: Types.ObjectId, ref: 'User' }], default: [] })
-  likedBy: Types.ObjectId[]; // Mảng chứa user IDs đã like bài viết
+  @Prop({
+    type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+    default: [],
+  })
+  likedBy: Types.ObjectId[];
 
-  @Prop({ type: [{ type: Types.ObjectId, ref: 'Comment' }], default: [] })
-  comments: Types.ObjectId[]; // Mảng chứa các comment IDs liên kết đến bài viết
-  
+  @Prop({
+    type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Comment' }],
+    default: [],
+  })
+  comments: Types.ObjectId[];
 }
-
-
 
 export const PostSchema = SchemaFactory.createForClass(Post);

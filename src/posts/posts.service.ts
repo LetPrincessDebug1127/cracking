@@ -19,7 +19,7 @@ export class PostService {
   ) {}
 
   async createPost(
-    userId: string,
+    userId: Types.ObjectId,
     createPostDto: CreatePostDto,
   ): Promise<object> {
     const newPost = new this.postModel({
@@ -147,7 +147,19 @@ export class PostService {
     return post_Id.comments.length;
   }
 
-  async getLikesForPost(postId: Types.ObjectId): Promise<string[]> {
+  async whoLiked(postId: Types.ObjectId): Promise<string[]> {
+    // const post = await this.postModel
+    //   .findById(postId)
+    //   .populate({ path: 'likedBy' })
+    //   .exec();
+
+    // if (!post) {
+    //   throw new NotFoundException('Bài viết không tồn tại');
+    // }
+    // if (!post.likedBy || post.likedBy.length === 0) {
+    //   return 0;
+    // }
+    // const likedUsernames = post.likedBy.map((likeduser) => likeduser.username);
     const post = await this.postModel
       .findById(postId)
       .populate<{ likedBy: User[] }>('likedBy', 'username') // Sử dụng type assertion tại đây
