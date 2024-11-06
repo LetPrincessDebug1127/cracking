@@ -2,6 +2,7 @@ import {
   Injectable,
   BadRequestException,
   UnauthorizedException,
+  NotFoundException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { InjectModel } from '@nestjs/mongoose';
@@ -11,6 +12,7 @@ import * as speakeasy from 'speakeasy';
 import { User } from '../../models/user.schema';
 import { CreateUserDto } from './register.dto';
 import { ResetPasswordDto } from './reset-password.dto';
+import { Types } from 'mongoose';
 
 @Injectable()
 export class UsersService {
@@ -243,5 +245,28 @@ export class UsersService {
     await newUser.save();
 
     return `Chúc mừng ${newUser.username}, bạn đã được tạo thành công với vai trò admin!`;
+  }
+
+  async deleteUser(
+    adminId: Types.ObjectId,
+    userId: Types.ObjectId,
+  ): Promise<string> {
+    const admin = await this.userModel.findById(adminId);
+    const user = await this.userModel.findById(userId);
+
+    if (!admin || !user) {
+      throw new NotFoundException('Tài khoản không tồn tại');
+    }
+
+    if (admin.role !== 'admin') {
+      return 'Bạn không phải Admin để xóa tài khoản của người khác';
+    }
+
+    if (user.role === 'user') {
+      await this.userModel.findByIdAndDelete(userId);
+      return 'Bạn đã xóa tài khoản này với tư cách là admin';
+    } else {
+      return 'Không thể xóa tài khoản có quyền cao hơn hoặc cùng cấp';
+    }
   }
 }

@@ -108,7 +108,7 @@ export class PostService {
       postId: post_Id,
     });
     const savedComment = await newComment.save();
-    // chỗ này viết hơi loạn, ý là comments của post thì save userId để api khác dùng
+    // chỗ này viết hơi loạn, ý là comments của post thì save userId để api who-commented dùng
     //còn api này trả về id của comment, 2 này khác nhau
     post_Id.comments.push(user_Id._id as Types.ObjectId);
     await post_Id.save();
