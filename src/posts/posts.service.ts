@@ -148,21 +148,9 @@ export class PostService {
   }
 
   async whoLiked(postId: Types.ObjectId): Promise<string[]> {
-    // const post = await this.postModel
-    //   .findById(postId)
-    //   .populate({ path: 'likedBy' })
-    //   .exec();
-
-    // if (!post) {
-    //   throw new NotFoundException('Bài viết không tồn tại');
-    // }
-    // if (!post.likedBy || post.likedBy.length === 0) {
-    //   return 0;
-    // }
-    // const likedUsernames = post.likedBy.map((likeduser) => likeduser.username);
     const post = await this.postModel
       .findById(postId)
-      .populate<{ likedBy: User[] }>('likedBy', 'username') // Sử dụng type assertion tại đây
+      .populate<{ likedBy: User[] }>('likedBy', 'username')
       .exec();
 
     if (!post) {
