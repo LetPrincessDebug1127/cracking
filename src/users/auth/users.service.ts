@@ -248,25 +248,27 @@ export class UsersService {
   }
 
   async deleteUser(
-    adminId: Types.ObjectId,
     userId: Types.ObjectId,
+    targetDelete: Types.ObjectId,
   ): Promise<string> {
-    const admin = await this.userModel.findById(adminId);
-    const user = await this.userModel.findById(userId);
+    const admin = await this.userModel.findById(userId);
+    const user = await this.userModel.findById(targetDelete);
 
-    if (!admin || !user) {
+    if (!user || !admin) {
       throw new NotFoundException('Tài khoản không tồn tại');
     }
 
-    if (admin.role !== 'admin') {
+    if (user.role === 'user') {
       return 'Bạn không phải Admin để xóa tài khoản của người khác';
     }
 
-    if (user.role === 'user') {
-      await this.userModel.findByIdAndDelete(userId);
+    if (user.role === 'user' && userId._id === targetDelete._id) {
+      await this.userModel.findByIdAndDelete(targetDelete);
+      return 'bạn đã xóa tài khoản này với tư cách là chủ sỡ hữu tài khoản';
+    }
+    if (user.role === 'admin') {
+      await this.userModel.findByIdAndDelete(targetDelete);
       return 'Bạn đã xóa tài khoản này với tư cách là admin';
-    } else {
-      return 'Không thể xóa tài khoản có quyền cao hơn hoặc cùng cấp';
     }
   }
 }

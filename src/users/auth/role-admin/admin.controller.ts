@@ -38,16 +38,21 @@ export class AdminController {
   }
 
   @Delete(':id/delete-user')
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(UserRole.ADMIN)
+  @UseGuards(JwtAuthGuard)
+  // @UseGuards(JwtAuthGuard, RolesGuard)
+  // @Roles(UserRole.ADMIN)
   @ApiBearerAuth()
+  @ApiOperation({
+    summary: 'Xóa User bằng tài khoản Admin hoặc User chủ sở hữu',
+  })
   @ApiResponse({
     status: 200,
     description: 'Đã xóa tài khoản thành công',
   })
   @ApiResponse({
     status: 401,
-    description: 'Bạn phải là Admin để xóa tài khoản của người khác',
+    description:
+      'Bạn phải là Admin hoặc chủ sở hữu TK để xóa tài khoản của người khác',
   })
   @ApiResponse({
     status: 404,
