@@ -144,8 +144,7 @@ export class PostController {
   }
 
   @Get(':id/total-comments')
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(UserRole.ADMIN)
+  @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @ApiResponse({
     status: 201,
@@ -153,7 +152,7 @@ export class PostController {
   })
   @ApiResponse({
     status: 401,
-    description: 'Bạn phải dùng tài khoản Admin mới truy vấn được',
+    description: 'Bạn phải đăng nhập mới truy vấn được',
   })
   async getTotalComments(
     @Param('id') postId: string,
@@ -189,5 +188,21 @@ export class PostController {
   async whoCommented(@Param('id') postId: string) {
     const post_Id = new Types.ObjectId(postId);
     return this.postService.whoCommented(post_Id);
+  }
+
+  @Get(':id/total-contentComments-a-post')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiResponse({
+    status: 201,
+    description: 'Lấy nội dung tất cả bình luận của một bài Post thành công',
+  })
+  @ApiResponse({
+    status: 401,
+    description: 'Bạn phải dùng tài khoản Admin mới truy vấn được',
+  })
+  async getAllCommentsContent(@Param('id') postId: string) {
+    const post = new Types.ObjectId(postId);
+    return this.postService.getAllComments(post);
   }
 }

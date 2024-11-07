@@ -258,10 +258,6 @@ export class UsersService {
       throw new NotFoundException('Tài khoản không tồn tại');
     }
 
-    if (user.role === 'user') {
-      return 'Bạn không phải Admin để xóa tài khoản của người khác';
-    }
-
     if (user.role === 'user' && userId._id === targetDelete._id) {
       await this.userModel.findByIdAndDelete(targetDelete);
       return 'bạn đã xóa tài khoản này với tư cách là chủ sỡ hữu tài khoản';
@@ -269,6 +265,10 @@ export class UsersService {
     if (user.role === 'admin') {
       await this.userModel.findByIdAndDelete(targetDelete);
       return 'Bạn đã xóa tài khoản này với tư cách là admin';
+    }
+
+    if (user.role === 'user' && userId._id !== targetDelete._id) {
+      return 'bạn không phải Admin để xóa tài khoản của người khác và cũng không phải chủ sở hữu tài khoản';
     }
   }
 }

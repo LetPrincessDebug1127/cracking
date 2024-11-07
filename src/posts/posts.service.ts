@@ -108,9 +108,11 @@ export class PostService {
       postId: post_Id,
     });
     const savedComment = await newComment.save();
-    // chỗ này viết hơi loạn, ý là comments của post thì save userId để api who-commented dùng
+    // chỗ này viết hơi loạn, ý là comments của post thì save userId để api who-commented dùng còn id của comment riêng cho route getAllComments
     //còn api này trả về id của comment, 2 này khác nhau
     post_Id.comments.push(user_Id._id as Types.ObjectId);
+    post_Id.commentReplies.push(savedComment._id as Types.ObjectId);
+
     await post_Id.save();
     return {
       commentId: savedComment._id.toString(),
@@ -178,5 +180,21 @@ export class PostService {
     }
     const commentedUsernames = post.comments.map((user) => user.username);
     return commentedUsernames;
+  }
+
+  async getAllComments(postId: Types.ObjectId): Promise<string[] | string> {
+    const post = await this.postModel
+      .findById(postId)
+      .populate<{ commentReplies: Comment[] }>('commentReplies', 'content');
+    if (!post) {
+      throw new NotFoundException('Bài viết không tồn tại');
+    }
+    if (!post.commentReplies || post.commentReplies.length === 0) {
+      return 'Bài viết này chưa có ai comment';
+    }
+    const getAllcontents = post.commentReplies.map(
+      (comment) => comment.content,
+    );
+    return getAllcontents;
   }
 }
