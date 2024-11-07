@@ -56,7 +56,7 @@ export class PostService {
     return await post.save();
   }
 
-  async getInformation(
+  async getInformationPost(
     postId: Types.ObjectId,
   ): Promise<{ likes: number; comments: number; content: string }> {
     const post = await this.postModel.findById(postId);

@@ -74,10 +74,9 @@ export class PostController {
     status: 400,
     description: 'Lấy thông tin thất bại',
   })
-  async getInformation(@Param('postId') postId: string) {
+  async getInformation(@Param('id') postId: string) {
     const post = new Types.ObjectId(postId);
-    const result = await this.postService.getInformation(post);
-    return result;
+    return this.postService.getInformationPost(post);
   }
 
   @Delete(':id/delete-post')
