@@ -56,12 +56,18 @@ export class PostService {
     return await post.save();
   }
 
-  async getLikesCount(postId: Types.ObjectId): Promise<number> {
-    const getLike_post = await this.postModel.findById(postId);
-    if (!getLike_post) {
-      throw new NotFoundException('ID bài post không đúng, không tìm thấy');
+  async getInformation(
+    postId: Types.ObjectId,
+  ): Promise<{ likes: number; comments: number; content: string }> {
+    const post = await this.postModel.findById(postId);
+    if (!post) {
+      throw new NotFoundException('Bài viết không tồn tại');
     }
-    return getLike_post.likes;
+    return {
+      likes: post.likes,
+      comments: post.commentReplies.length,
+      content: post.content,
+    };
   }
 
   // hàm này mình không trả về Promise vì mình toString() ở return nên TS dự đoán được kiểu
@@ -106,6 +112,7 @@ export class PostService {
       content: createPostDto.content,
       author: user_Id,
       postId: post_Id,
+      replyTo: null,
     });
     const savedComment = await newComment.save();
     // chỗ này viết hơi loạn, ý là comments của post thì save userId để api who-commented dùng còn id của comment riêng cho route getAllComments
@@ -142,14 +149,6 @@ export class PostService {
       return 'Bạn không phải tác giả của comment này, không có quyền xóa.';
     }
   }
-  // Chỗ này ban đầu mình bị một lỗi khá hay là quên await
-  async commentsCount(postId: Types.ObjectId): Promise<number> {
-    const post_Id = await this.postModel.findById(postId);
-    if (!post_Id) {
-      throw new NotFoundException('Bài viết không tồn tại');
-    }
-    return post_Id.comments.length;
-  }
 
   async whoLiked(postId: Types.ObjectId): Promise<string[] | string> {
     const post = await this.postModel
@@ -168,6 +167,7 @@ export class PostService {
   }
 
   // nếu sau này dùng dữ liệu lớn + thuật toán phức tạp thì mình sẽ dùng $lookup
+  //cái này lấy root comment thôi
   async whoCommented(postId: Types.ObjectId): Promise<string[] | string> {
     const post = await this.postModel
       .findById(postId)
@@ -196,5 +196,33 @@ export class PostService {
       (comment) => comment.content,
     );
     return getAllcontents;
+  }
+
+  // tự viết xong hàm này, xúc động lắm luôn. Mình nghĩ thế nào cũng có lỗi, nhưng nó chạy phản hồi cmt mượt cực
+  async responseComment(
+    commentId: Types.ObjectId,
+    contentResponse: CreatePostDto,
+  ) {
+    const parentComment = await this.commentModel.findById(commentId).exec();
+
+    if (!parentComment || parentComment.replyTo !== null) {
+      throw new NotFoundException('Không tìm thấy cmt gốc');
+    }
+
+    const newComment = new this.commentModel({
+      content: contentResponse.content,
+      replyTo: commentId,
+      postId: parentComment.postId,
+      author: parentComment.author,
+    });
+
+    const savedResponse = await newComment.save();
+    const post = await this.postModel.findById(savedResponse.postId);
+
+    post.commentReplies.push(savedResponse._id as Types.ObjectId);
+    await post.save();
+    return {
+      commentId: savedResponse._id.toString(),
+    };
   }
 }

@@ -19,6 +19,7 @@ import {
   ApiTags,
   ApiBearerAuth,
   ApiParam,
+  ApiOperation,
 } from '@nestjs/swagger';
 import { Types } from 'mongoose';
 import { RolesGuard } from '../users/auth/role-admin/roles';
@@ -59,24 +60,6 @@ export class PostController {
     const user_Id = new Types.ObjectId(req.user.userId);
 
     return this.postService.handleLikePost(user_Id, post_Id);
-  }
-
-  @Get(':id/total-likes')
-  @ApiResponse({
-    status: 201,
-    description: 'Lấy tổng số likes của một bài Post thành công',
-  })
-  @ApiResponse({
-    status: 401,
-    description: 'Bạn phải dùng tài khoản Admin mới truy vấn được',
-  })
-  async getLikesCount(
-    @Param('id') postId: string,
-  ): Promise<{ message: string }> {
-    const post_Id = new Types.ObjectId(postId);
-
-    const likes = await this.postService.getLikesCount(post_Id);
-    return { message: `Bài viết này có tổng cộng ${likes} likes.` };
   }
 
   @Delete(':id/delete-post')
@@ -143,25 +126,6 @@ export class PostController {
     return this.postService.deleteComment(user, comment);
   }
 
-  @Get(':id/total-comments')
-  @UseGuards(JwtAuthGuard)
-  @ApiBearerAuth()
-  @ApiResponse({
-    status: 201,
-    description: 'Lấy tổng số comments của một bài Post thành công',
-  })
-  @ApiResponse({
-    status: 401,
-    description: 'Bạn phải đăng nhập mới truy vấn được',
-  })
-  async getTotalComments(
-    @Param('id') postId: string,
-  ): Promise<{ message: string }> {
-    const post_Id = new Types.ObjectId(postId);
-    const total = await this.postService.commentsCount(post_Id);
-    return { message: `Bài viết này có tổng cộng ${total} bình luận` };
-  }
-
   @Get(':id/who-liked')
   @ApiResponse({
     status: 201,
@@ -204,5 +168,27 @@ export class PostController {
   async getAllCommentsContent(@Param('id') postId: string) {
     const post = new Types.ObjectId(postId);
     return this.postService.getAllComments(post);
+  }
+
+  @Post(':id/comment/reply-To-Comment')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Phản hồi lại một bình luận' })
+  @ApiResponse({
+    status: 201,
+    description:
+      'bạn đã phản hồi lại một bình luận thành công. Bạn nhận về commentID của bình luận con bạn vừa comment',
+  })
+  @ApiResponse({
+    status: 401,
+    description: 'Bạn cần đăng nhập trước khi bình luận',
+  })
+  async replyToComment(
+    @Param('id') commentId: string,
+    @Body() contentreply: CreatePostDto,
+  ) {
+    const comment = new Types.ObjectId(commentId);
+    const content = contentreply;
+    return this.postService.responseComment(comment, content);
   }
 }
