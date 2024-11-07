@@ -198,14 +198,14 @@ export class PostService {
     return getAllcontents;
   }
 
-  // tự viết xong hàm này, xúc động lắm luôn. Mình nghĩ thế nào cũng có lỗi, nhưng nó chạy phản hồi cmt mượt cực
+  // tự viết xong hàm này, xúc động lắm luôn. Mình nghĩ thế nào cũng có lỗi, nhưng nó chạy
   async responseComment(
     commentId: Types.ObjectId,
     contentResponse: CreatePostDto,
   ) {
     const parentComment = await this.commentModel.findById(commentId).exec();
 
-    if (!parentComment || parentComment.replyTo !== null) {
+    if (!parentComment) {
       throw new NotFoundException('Không tìm thấy cmt gốc');
     }
 
@@ -225,4 +225,6 @@ export class PostService {
       commentId: savedResponse._id.toString(),
     };
   }
+
+  async paginationComments() {}
 }

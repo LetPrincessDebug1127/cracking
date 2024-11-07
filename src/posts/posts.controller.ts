@@ -144,6 +144,10 @@ export class PostController {
   }
 
   @Get(':id/who-liked')
+  @ApiOperation({
+    summary:
+      'Khi người dùng cần ấn vào tổng số like tức là họ chỉ cần lấy ra list những ai like',
+  })
   @ApiResponse({
     status: 201,
     description: 'Đây là danh sách những ai đã like bài viết này',
@@ -158,6 +162,9 @@ export class PostController {
   }
 
   @Get(':id/who-commented')
+  @ApiOperation({
+    summary: 'Khi người dùng cần chỉ truy vấn ra list những ai comment',
+  })
   @ApiResponse({
     status: 201,
     description: 'Đây là danh sách những ai đã comment bài viết này',
@@ -190,6 +197,7 @@ export class PostController {
   @Post(':id/comment/reply-To-Comment')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
+  @ApiParam({ name: 'id', description: 'ID của root comment', type: String })
   @ApiOperation({ summary: 'Phản hồi lại một bình luận' })
   @ApiResponse({
     status: 201,
