@@ -61,6 +61,24 @@ export class PostController {
 
     return this.postService.handleLikePost(user_Id, post_Id);
   }
+  @Get(':id/information')
+  @ApiOperation({
+    summary:
+      'Chưa ấn vào thì chỉ thấy nội dung post, tổng số lượt like và cmt bài post',
+  })
+  @ApiResponse({
+    status: 201,
+    description: 'Lấy thông tin thành công',
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Lấy thông tin thất bại',
+  })
+  async getInformation(@Param('postId') postId: string) {
+    const post = new Types.ObjectId(postId);
+    const result = await this.postService.getInformation(post);
+    return result;
+  }
 
   @Delete(':id/delete-post')
   @UseGuards(JwtAuthGuard, RolesGuard)
