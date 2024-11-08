@@ -231,11 +231,12 @@ export class PostController {
   })
   @ApiOperation({
     summary:
-      'Lấy ra username, content comments, current Page và tổng số childComments của rootComments',
+      'Lấy ra author, content comments, current Page và tổng số childComments của rootComments',
   })
   @ApiResponse({
     status: 201,
-    description: 'Bạn đã truy vấn thành công',
+    description:
+      'Bạn đã truy vấn thành công. Query bị false sẽ cho default = 1',
   })
   @ApiResponse({
     status: 401,
@@ -249,5 +250,31 @@ export class PostController {
     const postObjectId = new Types.ObjectId(postId);
     const page = query.page > 0 ? query.page : 1;
     return this.postService.paginationComments(postObjectId, page);
+  }
+
+  @Get(':id/getAll-childComments')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiParam({
+    name: 'id',
+    description:
+      'ID của root comment, có thể dùng ID này để test : 672cce4f481274c057ba29f0',
+    type: String,
+  })
+  @ApiOperation({
+    summary:
+      'Lấy ra author, content comments của rootComments. Trải phẳng child comments',
+  })
+  @ApiResponse({
+    status: 201,
+    description: 'Bạn đã truy vấn thành công',
+  })
+  @ApiResponse({
+    status: 401,
+    description: 'Bạn cần đăng nhập trước khi bình luận',
+  })
+  async getChildComments(@Param('id') rootCommentId: string) {
+    const rootComment = new Types.ObjectId(rootCommentId);
+    return this.postService.getAllChildComments(rootComment);
   }
 }
