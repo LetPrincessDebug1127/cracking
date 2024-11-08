@@ -38,11 +38,11 @@ export class PostService {
   ): Promise<object> {
     const post = await this.postModel.findById(postId);
 
-    if (!post) {
+    if (!post)
       throw new NotFoundException(
         'Không tìm thấy bài viết. Có vẻ id không đúng',
       );
-    }
+
     const userIndex = post.likedBy.indexOf(userId);
 
     if (userIndex === -1) {
@@ -60,9 +60,8 @@ export class PostService {
     postId: Types.ObjectId,
   ): Promise<{ likes: number; comments: number; content: string }> {
     const post = await this.postModel.findById(postId);
-    if (!post) {
-      throw new NotFoundException('Bài viết không tồn tại');
-    }
+    if (!post) throw new NotFoundException('Bài viết không tồn tại');
+
     return {
       likes: post.likes,
       comments: post.commentReplies.length,
@@ -205,9 +204,7 @@ export class PostService {
   ) {
     const parentComment = await this.commentModel.findById(commentId).exec();
 
-    if (!parentComment) {
-      throw new NotFoundException('Không tìm thấy cmt gốc');
-    }
+    if (!parentComment) throw new NotFoundException('Không tìm thấy cmt gốc');
 
     const newComment = new this.commentModel({
       content: contentResponse.content,
@@ -226,5 +223,43 @@ export class PostService {
     };
   }
 
-  async paginationComments() {}
+  //   lấy ra ROOT COMMENT  !!!
+  // lấy page từ querry param thôi, còn cố định 10 cmts mỗi trang
+  async paginationComments(postId: Types.ObjectId, page: number) {
+    const limit = 10;
+    const skip = (page - 1) * limit;
+
+    const post = await this.postModel.findById(postId);
+    if (!post) throw new NotFoundException('Bài viết không tồn tại');
+
+    const rootComments = await this.commentModel
+      .find({ postId, replyTo: null })
+      .skip(skip)
+      .limit(limit)
+      .populate<{ author: User }>('author', 'username')
+      .exec();
+
+    const allComments = await this.commentModel.find({ postId }).exec();
+
+    // child comments
+    const childCommentMap = allComments.reduce((map, comment) => {
+      if (comment.replyTo) {
+        const parentId = comment.replyTo.toString();
+        map[parentId] = (map[parentId] || 0) + 1;
+      }
+      return map;
+    }, {});
+
+    // return
+    const data = rootComments.map((comment) => ({
+      author: comment.author.username,
+      content: comment.content,
+      childComments: childCommentMap[comment._id.toString()] || 0,
+    }));
+
+    return {
+      currentPage: page,
+      comments: data,
+    };
+  }
 }

@@ -9,6 +9,7 @@ import {
   BadRequestException,
   NotFoundException,
   Delete,
+  Query,
 } from '@nestjs/common';
 import { PostService } from './posts.service';
 import { JwtAuthGuard } from '../users/auth/jwt-auth.guard';
@@ -25,6 +26,7 @@ import { Types } from 'mongoose';
 import { RolesGuard } from '../users/auth/role-admin/roles';
 import { UserRole } from '../users/auth/role-admin/user-role.enum';
 import { Roles } from '../users/auth/role-admin/role.decorator';
+import { PaginationQueryDto } from '../dto.all.ts/PaginationQueryDto';
 
 @ApiTags('Posts')
 @Controller('posts')
@@ -161,38 +163,38 @@ export class PostController {
     return this.postService.whoLiked(post_Id);
   }
 
-  @Get(':id/who-commented')
-  @ApiOperation({
-    summary: 'Khi người dùng cần chỉ truy vấn ra list những ai comment',
-  })
-  @ApiResponse({
-    status: 201,
-    description: 'Đây là danh sách những ai đã comment bài viết này',
-  })
-  @ApiResponse({
-    status: 400,
-    description: 'Lấy danh sách thất bại',
-  })
-  async whoCommented(@Param('id') postId: string) {
-    const post_Id = new Types.ObjectId(postId);
-    return this.postService.whoCommented(post_Id);
-  }
+  // @Get(':id/who-commented')
+  // @ApiOperation({
+  //   summary: 'Khi cần lấy ra list cmts',
+  // })
+  // @ApiResponse({
+  //   status: 201,
+  //   description: 'Đây là danh sách những ai đã comment bài viết này',
+  // })
+  // @ApiResponse({
+  //   status: 400,
+  //   description: 'Lấy danh sách thất bại',
+  // })
+  // async whoCommented(@Param('id') postId: string) {
+  //   const post_Id = new Types.ObjectId(postId);
+  //   return this.postService.whoCommented(post_Id);
+  // }
 
-  @Get(':id/total-contentComments-a-post')
-  @UseGuards(JwtAuthGuard)
-  @ApiBearerAuth()
-  @ApiResponse({
-    status: 201,
-    description: 'Lấy nội dung tất cả bình luận của một bài Post thành công',
-  })
-  @ApiResponse({
-    status: 401,
-    description: 'Bạn phải dùng tài khoản Admin mới truy vấn được',
-  })
-  async getAllCommentsContent(@Param('id') postId: string) {
-    const post = new Types.ObjectId(postId);
-    return this.postService.getAllComments(post);
-  }
+  // @Get(':id/total-contentComments-a-post')
+  // @UseGuards(JwtAuthGuard)
+  // @ApiBearerAuth()
+  // @ApiResponse({
+  //   status: 201,
+  //   description: 'Lấy nội dung tất cả bình luận của một bài Post thành công',
+  // })
+  // @ApiResponse({
+  //   status: 401,
+  //   description: 'Bạn phải dùng tài khoản Admin mới truy vấn được',
+  // })
+  // async getAllCommentsContent(@Param('id') postId: string) {
+  //   const post = new Types.ObjectId(postId);
+  //   return this.postService.getAllComments(post);
+  // }
 
   @Post(':id/comment/reply-To-Comment')
   @UseGuards(JwtAuthGuard)
@@ -215,5 +217,37 @@ export class PostController {
     const comment = new Types.ObjectId(commentId);
     const content = contentreply;
     return this.postService.responseComment(comment, content);
+  }
+
+  //phân trang
+  @Get(':id/pagination-rootComments')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiParam({
+    name: 'id',
+    description:
+      'ID của bài viết, có thể dùng ID này để test : 672cc88812fcc210c2a5f325',
+    type: String,
+  })
+  @ApiOperation({
+    summary:
+      'Lấy ra username, content comments, current Page và tổng số childComments của rootComments',
+  })
+  @ApiResponse({
+    status: 201,
+    description: 'Bạn đã truy vấn thành công',
+  })
+  @ApiResponse({
+    status: 401,
+    description: 'Bạn cần đăng nhập trước khi bình luận',
+  })
+  // bên fe lo cái vụ query này
+  async paginationComments(
+    @Param('id') postId: string,
+    @Query() query: PaginationQueryDto,
+  ) {
+    const postObjectId = new Types.ObjectId(postId);
+    const page = query.page > 0 ? query.page : 1;
+    return this.postService.paginationComments(postObjectId, page);
   }
 }
