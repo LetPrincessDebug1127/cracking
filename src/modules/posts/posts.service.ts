@@ -242,6 +242,8 @@ export class PostService {
     const allComments = await this.commentModel.find({ postId }).exec();
 
     // child comments
+    // thêm key-value pair vào bằng cú pháp object[key]= value
+    //
     const childCommentMap = allComments.reduce((map, comment) => {
       if (comment.replyTo) {
         const parentId = comment.replyTo.toString();

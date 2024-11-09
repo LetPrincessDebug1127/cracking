@@ -6,9 +6,9 @@ import { join } from 'path';
 
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { UsersModule } from './users/auth/users.module';
-import { AuthModule } from './firebase/firebase.module';
-import { PostsModule } from './posts/posts.module';
+import { UsersModule } from './modules/users/auth/users.module';
+import { AuthModule } from './modules/firebase/firebase.module';
+import { PostsModule } from './modules/posts/posts.module';
 
 @Module({
   imports: [

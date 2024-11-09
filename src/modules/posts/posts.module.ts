@@ -8,6 +8,7 @@ import { PostService } from './posts.service';
 import { Post, PostSchema } from '../models/posts.schema';
 import { User, UserSchema } from '../models/user.schema';
 import { Comment, CommentSchema } from '../models/comments.schema';
+import { commentController } from './comments.controller';
 
 @Module({
   imports: [
@@ -26,7 +27,7 @@ import { Comment, CommentSchema } from '../models/comments.schema';
     }),
   ],
 
-  controllers: [PostController],
+  controllers: [PostController, commentController],
   providers: [PostService],
   exports: [PostService],
 })
