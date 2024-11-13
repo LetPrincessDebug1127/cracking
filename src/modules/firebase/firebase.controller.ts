@@ -4,7 +4,7 @@ import { FirebaseAdminService } from './firebase.service';
 import { ApiTags, ApiOperation, ApiResponse, ApiBody } from '@nestjs/swagger';
 import { idTokenDto } from './firebase_token-dto';
 
-@ApiTags('Auth-Firebase')
+@ApiTags('Firebase Login W Google')
 @Controller('auth')
 export class AuthController {
   constructor(private readonly firebaseAdminService: FirebaseAdminService) {}

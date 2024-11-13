@@ -96,34 +96,32 @@ export class PostService {
   }
 
   // hàm này mình không trả về Promise vì mình toString() ở return nên TS dự đoán được kiểu
+  //hàm này mình bỏ rồi
+  // async createComment(
+  //   userId: Types.ObjectId,
+  //   postId: Types.ObjectId,
+  //   createPostDto: CreatePostDto,
+  // ) {
+  //   const post_Id = await this.postModel.findById(postId);
+  //   const user_Id = await this.userModel.findById(userId);
+  //   if (!post_Id) {
+  //     throw new NotFoundException('Bài viết không tồn tại');
+  //   }
+  //   const newComment = new this.commentModel({
+  //     content: createPostDto.content,
+  //     author: user_Id,
+  //     postId: post_Id,
+  //     replyTo: null,
+  //   });
+  //   const savedComment = await newComment.save();
+  //   post_Id.comments.push(user_Id._id as Types.ObjectId);
+  //   post_Id.commentReplies.push(savedComment._id as Types.ObjectId);
 
-  async createComment(
-    userId: Types.ObjectId,
-    postId: Types.ObjectId,
-    createPostDto: CreatePostDto,
-  ) {
-    const post_Id = await this.postModel.findById(postId);
-    const user_Id = await this.userModel.findById(userId);
-    if (!post_Id) {
-      throw new NotFoundException('Bài viết không tồn tại');
-    }
-    const newComment = new this.commentModel({
-      content: createPostDto.content,
-      author: user_Id,
-      postId: post_Id,
-      replyTo: null,
-    });
-    const savedComment = await newComment.save();
-    // chỗ này viết hơi loạn, ý là comments của post thì save userId để api who-commented dùng còn id của comment riêng cho route getAllComments
-    //còn api này trả về id của comment, 2 này khác nhau
-    post_Id.comments.push(user_Id._id as Types.ObjectId);
-    post_Id.commentReplies.push(savedComment._id as Types.ObjectId);
-
-    await post_Id.save();
-    return {
-      commentId: savedComment._id.toString(),
-    };
-  }
+  //   await post_Id.save();
+  //   return {
+  //     commentId: savedComment._id.toString(),
+  //   };
+  // }
 
   async deleteComment(userId: Types.ObjectId, commentId: Types.ObjectId) {
     const user = await this.userModel.findById(userId);
@@ -164,32 +162,31 @@ export class PostService {
     const likedUsernames = post.likedBy.map((user) => user.username);
     return likedUsernames;
   }
+  //hàm này mình bỏ rồi
+  // async responseComment(
+  //   commentId: Types.ObjectId,
+  //   contentResponse: CreatePostDto,
+  // ) {
+  //   const parentComment = await this.commentModel.findById(commentId).exec();
 
-  // tự viết xong hàm này, xúc động lắm luôn. Mình nghĩ thế nào cũng có lỗi, nhưng nó chạy
-  async responseComment(
-    commentId: Types.ObjectId,
-    contentResponse: CreatePostDto,
-  ) {
-    const parentComment = await this.commentModel.findById(commentId).exec();
+  //   if (!parentComment) throw new NotFoundException('Không tìm thấy cmt gốc');
 
-    if (!parentComment) throw new NotFoundException('Không tìm thấy cmt gốc');
+  //   const newComment = new this.commentModel({
+  //     content: contentResponse.content,
+  //     replyTo: commentId,
+  //     postId: parentComment.postId,
+  //     author: parentComment.author,
+  //   });
 
-    const newComment = new this.commentModel({
-      content: contentResponse.content,
-      replyTo: commentId,
-      postId: parentComment.postId,
-      author: parentComment.author,
-    });
+  //   const savedResponse = await newComment.save();
+  //   const post = await this.postModel.findById(savedResponse.postId);
 
-    const savedResponse = await newComment.save();
-    const post = await this.postModel.findById(savedResponse.postId);
-
-    post.commentReplies.push(savedResponse._id as Types.ObjectId);
-    await post.save();
-    return {
-      commentId: savedResponse._id.toString(),
-    };
-  }
+  //   post.commentReplies.push(savedResponse._id as Types.ObjectId);
+  //   await post.save();
+  //   return {
+  //     commentId: savedResponse._id.toString(),
+  //   };
+  // }
 
   //   lấy ra ROOT COMMENT  !!!
   // lấy page từ querry param thôi, còn cố định 10 cmts mỗi trang
@@ -255,9 +252,37 @@ export class PostService {
   }
   async postComments(
     postId: Types.ObjectId,
-    content: CreatePostDto,
-  ): Promise<any> {
+    userId: Types.ObjectId,
+    createDtoPost: CreatePostDto,
+  ): Promise<{ commentId: string; message: string }> {
     const post = await this.postModel.findById(postId);
-    if (!post) throw new NotFoundException();
+    if (!post) throw new NotFoundException('Bài viết không tồn tại');
+
+    const childComment = await this.commentModel.find({
+      postId,
+      replyTo: null,
+    });
+    const newComment = new this.commentModel({
+      content: createDtoPost.content,
+      author: userId,
+      postId: postId,
+      replyTo: childComment.length === 0 ? null : childComment[0]._id,
+    });
+
+    const savedComment = await newComment.save();
+
+    post.comments.push(userId._id as Types.ObjectId);
+    post.commentReplies.push(savedComment._id as Types.ObjectId);
+    await post.save();
+
+    const message =
+      savedComment.replyTo === null
+        ? 'Bạn đã tạo root comment thành công'
+        : 'Bạn đã phản hồi lại root comment thành công ';
+
+    return {
+      commentId: savedComment._id.toString(),
+      message: message,
+    };
   }
 }

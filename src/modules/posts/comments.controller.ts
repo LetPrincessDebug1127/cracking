@@ -38,7 +38,8 @@ export class commentController {
   @ApiBearerAuth()
   @ApiResponse({
     status: 201,
-    description: 'Đã comment thành công',
+    description:
+      'Bạn đã phản hồi lại root comment hoặc bạn đã comment root comment thành công ',
   })
   @ApiResponse({
     status: 401,
@@ -56,7 +57,7 @@ export class commentController {
     if (!contentComment.content) {
       throw new BadRequestException('Nội dung comment không hợp lệ');
     }
-    return this.postService.createComment(user_Id, post_Id, contentComment);
+    return this.postService.postComments(post_Id, user_Id, contentComment);
   }
 
   @Delete(':id')
@@ -77,28 +78,28 @@ export class commentController {
     return this.postService.deleteComment(user, comment);
   }
 
-  @Post(':id/reply-To-Comment')
-  @UseGuards(JwtAuthGuard)
-  @ApiBearerAuth()
-  @ApiParam({ name: 'id', description: 'ID của root comment', type: String })
-  @ApiOperation({ summary: 'Phản hồi lại một bình luận' })
-  @ApiResponse({
-    status: 201,
-    description:
-      'bạn đã phản hồi lại một bình luận thành công. Bạn nhận về commentID của bình luận con bạn vừa comment',
-  })
-  @ApiResponse({
-    status: 401,
-    description: 'Bạn cần đăng nhập trước khi bình luận',
-  })
-  async replyToComment(
-    @Param('id') commentId: string,
-    @Body() contentreply: CreatePostDto,
-  ) {
-    const comment = new Types.ObjectId(commentId);
-    const content = contentreply;
-    return this.postService.responseComment(comment, content);
-  }
+  // @Post(':id/reply-To-Comment')
+  // @UseGuards(JwtAuthGuard)
+  // @ApiBearerAuth()
+  // @ApiParam({ name: 'id', description: 'ID của root comment', type: String })
+  // @ApiOperation({ summary: 'Phản hồi lại một bình luận' })
+  // @ApiResponse({
+  //   status: 201,
+  //   description:
+  //     'bạn đã phản hồi lại một bình luận thành công. Bạn nhận về commentID của bình luận con bạn vừa comment',
+  // })
+  // @ApiResponse({
+  //   status: 401,
+  //   description: 'Bạn cần đăng nhập trước khi bình luận',
+  // })
+  // async replyToComment(
+  //   @Param('id') commentId: string,
+  //   @Body() contentreply: CreatePostDto,
+  // ) {
+  //   const comment = new Types.ObjectId(commentId);
+  //   const content = contentreply;
+  //   return this.postService.responseComment(comment, content);
+  // }
 
   //phân trang
   @Get(':id/rootComments')

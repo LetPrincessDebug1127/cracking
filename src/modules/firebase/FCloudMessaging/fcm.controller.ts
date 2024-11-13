@@ -29,6 +29,7 @@ export class NotificationController {
     @Body('body') body: string,
   ): Promise<string> {
     await this.fcmService.sendNotification(token, title, body);
+    //token này của FCM nên BE sẽ không biết được, viết if ở đây cho vui thôi chứ không có tác dụng gì
     if (!token) {
       throw new BadRequestException('Token is required.');
     }
