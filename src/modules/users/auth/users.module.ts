@@ -5,9 +5,9 @@ import { UsersController } from './user.controller';
 import { UsersService } from './users.service';
 import { User, UserSchema } from '../../models/user.schema';
 import { JwtModule } from '@nestjs/jwt';
-import { JwtStrategy } from './jwt.strategy';
+import { JwtStrategy } from '../../jwtstrategy/jwt.strategy';
 import { ConfigModule } from '@nestjs/config';
-import { JwtRefreshTokenStrategy } from './jwt-refresh-token.strategy.ts';
+import { JwtRefreshTokenStrategy } from '../../jwtstrategy/jwt-refresh-token.strategy.ts';
 import { AuthService } from './refreshToken.service';
 import { AdminController } from './role-admin/admin.controller';
 

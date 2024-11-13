@@ -10,8 +10,8 @@ import { Model } from 'mongoose';
 import * as bcrypt from 'bcrypt';
 import * as speakeasy from 'speakeasy';
 import { User } from '../../models/user.schema';
-import { CreateUserDto } from './register.dto';
-import { ResetPasswordDto } from './reset-password.dto';
+import { CreateUserDto } from '../../dto.all.ts/register.dto';
+import { ResetPasswordDto } from '../../dto.all.ts/reset-password.dto';
 import { Types } from 'mongoose';
 
 @Injectable()

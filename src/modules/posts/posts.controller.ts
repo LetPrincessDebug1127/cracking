@@ -12,7 +12,7 @@ import {
   Query,
 } from '@nestjs/common';
 import { PostService } from './posts.service';
-import { JwtAuthGuard } from '../users/auth/jwt-auth.guard';
+import { JwtAuthGuard } from '../jwtstrategy/jwt-auth.guard';
 import { CreatePostDto } from '../dto.all.ts/create-post.dto';
 import {
   ApiBody,

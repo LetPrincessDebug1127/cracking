@@ -9,7 +9,7 @@ import { AppService } from './app.service';
 import { UsersModule } from './modules/users/auth/users.module';
 import { AuthModule } from './modules/firebase/firebase.module';
 import { PostsModule } from './modules/posts/posts.module';
-
+// import { FcmModule } from './modules/firebase/FCloudMessaging/fcm.module';
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
@@ -30,6 +30,7 @@ import { PostsModule } from './modules/posts/posts.module';
     UsersModule,
     AuthModule,
     PostsModule,
+    // FcmModule,
   ],
 
   controllers: [AppController],

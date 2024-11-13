@@ -6,6 +6,7 @@ import {
   Get,
   UnauthorizedException,
   Req,
+  Res,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -15,16 +16,16 @@ import {
   ApiBearerAuth,
 } from '@nestjs/swagger';
 import { UsersService } from './users.service';
-import { JwtAuthGuard } from './jwt-auth.guard';
-import { CreateUserDto } from './register.dto';
-import { LoginUserDto } from './login.dto';
-import { SecurityAnswerUserDto } from './security.answer.dto';
+import { JwtAuthGuard } from '../../jwtstrategy/jwt-auth.guard';
+import { CreateUserDto } from '../../dto.all.ts/register.dto';
+import { LoginUserDto } from '../../dto.all.ts/login.dto';
+import { SecurityAnswerUserDto } from '../../dto.all.ts/security.answer.dto';
 
-import { JwtRefreshTokenGuard } from './jwt-refresh-token.guard';
+import { JwtRefreshTokenGuard } from '../../jwtstrategy/jwt-refresh-token.guard';
 import { Request } from 'express';
 import { AuthService } from './refreshToken.service';
 import { RefreshTokenDto } from './refresh-token.dto';
-import { ResetPasswordDto } from './reset-password.dto';
+import { ResetPasswordDto } from '../../dto.all.ts/reset-password.dto';
 import { RolesGuard } from './role-admin/roles';
 import { UserRole } from './role-admin/user-role.enum';
 
@@ -132,7 +133,9 @@ export class UsersController {
     return { message: 'OTP verified successfully' };
   }
   @Post('refresh-token')
-  @ApiOperation({ summary: 'Refresh access and refresh tokens' })
+  @ApiOperation({
+    summary: 'Chừng nào có FE mình sẽ config rf token vào http cookies sau',
+  })
   @ApiResponse({
     status: 200,
     description: 'New access and refresh tokens generated',

@@ -8,7 +8,7 @@ import {
 } from '@nestjs/common';
 import { ApiTags, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
 import { AppService } from './app.service';
-import { JwtAuthGuard } from './modules/users/auth/jwt-auth.guard';
+import { JwtAuthGuard } from './modules/jwtstrategy/jwt-auth.guard';
 import { RolesGuard } from './modules/users/auth/role-admin/roles';
 import { UserRole } from './modules/users/auth/role-admin/user-role.enum';
 

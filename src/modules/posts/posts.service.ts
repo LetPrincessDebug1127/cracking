@@ -165,38 +165,6 @@ export class PostService {
     return likedUsernames;
   }
 
-  // nếu sau này dùng dữ liệu lớn + thuật toán phức tạp thì mình sẽ dùng $lookup
-  //cái này lấy root comment thôi
-  // async whoCommented(postId: Types.ObjectId): Promise<string[] | string> {
-  //   const post = await this.postModel
-  //     .findById(postId)
-  //     .populate<{ comments: User[] }>('comments', 'username');
-  //   if (!post) {
-  //     throw new NotFoundException('Bài viết không tồn tại');
-  //   }
-  //   if (!post.comments || post.comments.length === 0) {
-  //     return 'Bài viết này chưa có ai comment';
-  //   }
-  //   const commentedUsernames = post.comments.map((user) => user.username);
-  //   return commentedUsernames;
-  // }
-
-  // async getAllComments(postId: Types.ObjectId): Promise<string[] | string> {
-  //   const post = await this.postModel
-  //     .findById(postId)
-  //     .populate<{ commentReplies: Comment[] }>('commentReplies', 'content');
-  //   if (!post) {
-  //     throw new NotFoundException('Bài viết không tồn tại');
-  //   }
-  //   if (!post.commentReplies || post.commentReplies.length === 0) {
-  //     return 'Bài viết này chưa có ai comment';
-  //   }
-  //   const getAllcontents = post.commentReplies.map(
-  //     (comment) => comment.content,
-  //   );
-  //   return getAllcontents;
-  // }
-
   // tự viết xong hàm này, xúc động lắm luôn. Mình nghĩ thế nào cũng có lỗi, nhưng nó chạy
   async responseComment(
     commentId: Types.ObjectId,
@@ -284,5 +252,12 @@ export class PostService {
       rootCommentId,
       childComments: data,
     };
+  }
+  async postComments(
+    postId: Types.ObjectId,
+    content: CreatePostDto,
+  ): Promise<any> {
+    const post = await this.postModel.findById(postId);
+    if (!post) throw new NotFoundException();
   }
 }
