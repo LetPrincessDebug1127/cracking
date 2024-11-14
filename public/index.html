@@ -34,10 +34,11 @@
   </body>
   <script>
     // Kết nối WebSocket với server
-    const socket = io('http://localhost:3000', {
+    const socket = io('http://localhost:3000', 
+    {
       transports: ['websocket'],
       auth: {
-        token:'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InR0dCIsInN1YiI6IjY3MTcyYWEwODQzMzQ5MWQ0NWExZjM2YyIsInJvbGUiOiJ1c2VyIiwiaWF0IjoxNzMxNTY4OTYzLCJleHAiOjE3MzE1Njk4NjN9.q8ySOPcRQPGKVoqqwuXS_icumC6FseFiLX3lfaRm-RY', 
+        token:'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InR0dCIsInN1YiI6IjY3MTcyYWEwODQzMzQ5MWQ0NWExZjM2YyIsImlhdCI6MTczMTYwMTY2MiwiZXhwIjoxNzMxNjAyNTYyfQ.hzUN9D8NJhQoLAq-JOYlXhDAy-1nlliCdZvGDtc5zOE', 
       },
     });
 

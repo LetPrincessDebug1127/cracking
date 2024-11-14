@@ -1,4 +1,4 @@
-import { NotificationsController } from './events.controller';
+// import { NotificationsController } from './events.controller';
 import { NotificationsGateway } from './events.gateway';
 
 import { Module } from '@nestjs/common';
@@ -18,7 +18,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
     }),
   ],
 
-  controllers: [NotificationsController],
+  controllers: [],
   providers: [NotificationsGateway],
   exports: [NotificationsGateway],
 })

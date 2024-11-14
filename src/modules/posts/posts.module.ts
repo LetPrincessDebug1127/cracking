@@ -9,6 +9,8 @@ import { Post, PostSchema } from '../models/posts.schema';
 import { User, UserSchema } from '../models/user.schema';
 import { Comment, CommentSchema } from '../models/comments.schema';
 import { commentController } from './comments.controller';
+import { SocketModule } from '../notifications/events.module';
+// import { NotificationsController } from '../notifications/events.controller';
 
 @Module({
   imports: [
@@ -25,10 +27,11 @@ import { commentController } from './comments.controller';
       }),
       inject: [ConfigService],
     }),
+    SocketModule,
   ],
 
   controllers: [PostController, commentController],
-  providers: [PostService],
+  providers: [PostService, SocketModule],
   exports: [PostService],
 })
 export class PostsModule {}

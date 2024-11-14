@@ -7,6 +7,7 @@ import { JwtService } from '@nestjs/jwt';
 import { Types } from 'mongoose';
 import { User } from '../models/user.schema';
 import { Comment } from '../models/comments.schema';
+import { NotificationsGateway } from '../notifications/events.gateway';
 
 @Injectable()
 export class PostService {
@@ -16,6 +17,7 @@ export class PostService {
     @InjectModel(Comment.name) private commentModel: Model<Comment>,
 
     private readonly jwtService: JwtService,
+    private readonly notificationsGateway: NotificationsGateway,
   ) {}
 
   async createPost(
@@ -48,6 +50,14 @@ export class PostService {
     if (userIndex === -1) {
       post.likedBy.push(userId);
       post.likes += 1;
+
+      // Gửi thông báo đến chủ sở hữu bài viết
+      const totalLikes = post.likes;
+      const ownerId = post.author.toString(); // Lấy ID của chủ bài viết
+      this.notificationsGateway.sendNotificationToUser(
+        ownerId,
+        `${totalLikes} người đã like bài post của bạn`,
+      );
     } else {
       post.likedBy.splice(userIndex, 1);
       post.likes -= 1;
@@ -258,10 +268,15 @@ export class PostService {
     const post = await this.postModel.findById(postId);
     if (!post) throw new NotFoundException('Bài viết không tồn tại');
 
+    const allComments = await this.commentModel.find({
+      postId,
+    });
+
     const childComment = await this.commentModel.find({
       postId,
       replyTo: null,
     });
+
     const newComment = new this.commentModel({
       content: createDtoPost.content,
       author: userId,
@@ -275,10 +290,37 @@ export class PostService {
     post.commentReplies.push(savedComment._id as Types.ObjectId);
     await post.save();
 
+    const ownerId = post.author.toString(); // Get the post owner's userId
+    const totalCmt = post.commentReplies.length;
+
+    this.notificationsGateway.sendNotificationToUser(
+      ownerId,
+      `Bài viết của bạn có ${totalCmt} bình luận mới`,
+    );
+
+    if (savedComment.replyTo !== null) {
+      const parentComment = allComments.find(
+        (comment) => comment._id.toString() === savedComment.replyTo.toString(),
+      );
+
+      if (parentComment) {
+        const authorId = parentComment.author.toString();
+        const countResponse = allComments.filter(
+          (comment) =>
+            comment.replyTo?.toString() === parentComment._id.toString(),
+        ).length;
+
+        this.notificationsGateway.sendNotificationToUser(
+          authorId,
+          `Bình luận của bạn có ${countResponse} phản hồi`,
+        );
+      }
+    }
+
     const message =
       savedComment.replyTo === null
         ? 'Bạn đã tạo root comment thành công'
-        : 'Bạn đã phản hồi lại root comment thành công ';
+        : 'Bạn đã phản hồi lại root comment thành công';
 
     return {
       commentId: savedComment._id.toString(),

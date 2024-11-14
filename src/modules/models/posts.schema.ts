@@ -9,7 +9,7 @@ export class Post extends mongoose.Document {
   content: string;
 
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true })
-  author: Types.ObjectId[];
+  author: Types.ObjectId;
 
   @Prop({ default: 0 })
   likes: number;
