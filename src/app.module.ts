@@ -9,7 +9,8 @@ import { AppService } from './app.service';
 import { UsersModule } from './modules/users/auth/users.module';
 import { AuthModule } from './modules/firebase/firebase.module';
 import { PostsModule } from './modules/posts/posts.module';
-// import { FcmModule } from './modules/firebase/FCloudMessaging/fcm.module';
+import { SocketModule } from './modules/notifications/events.module';
+
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
@@ -30,10 +31,10 @@ import { PostsModule } from './modules/posts/posts.module';
     UsersModule,
     AuthModule,
     PostsModule,
-    // FcmModule,
+    SocketModule,
   ],
 
   controllers: [AppController],
-  providers: [AppService, AuthModule, PostsModule],
+  providers: [AppService, AuthModule, PostsModule, SocketModule],
 })
 export class AppModule {}

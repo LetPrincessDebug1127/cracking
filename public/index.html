@@ -20,7 +20,8 @@
 
 
     <script type="module" defer src="./js/firebase-config.js"></script>
-    <!-- <script type="module" defer src="./js/fcm.js"></script> -->
+    <script src="https://cdn.socket.io/4.6.1/socket.io.min.js"></script>
+    <script type="module" defer src="./js/socket.js"></script>
 
   </head>
   <br>
@@ -28,6 +29,21 @@
     <h1>Test FCM Token Retrieval</h1>
     <a id="request-permission">Request Notification Permission</a>
     <div id="output"></div>
-   
+    <div id="notification">notification</div>
+
   </body>
+  <script>
+    // Kết nối WebSocket với server
+    const socket = io('http://localhost:3000', {
+      transports: ['websocket'],
+      auth: {
+        token:'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InR0dCIsInN1YiI6IjY3MTcyYWEwODQzMzQ5MWQ0NWExZjM2YyIsInJvbGUiOiJ1c2VyIiwiaWF0IjoxNzMxNTY4OTYzLCJleHAiOjE3MzE1Njk4NjN9.q8ySOPcRQPGKVoqqwuXS_icumC6FseFiLX3lfaRm-RY', 
+      },
+    });
+
+    // Lắng nghe sự kiện 'notification'
+    socket.on('notification', (msg) => {
+      document.getElementById('notification').textContent = msg;
+    });
+  </script>
 </html>

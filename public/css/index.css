@@ -85,7 +85,8 @@ button {
   cursor: pointer;
   color: blue;
 }
-#loginwithGG {
+#loginwithGG,
+#notification {
   display: block;
   margin-top: 10px;
   cursor: pointer;
