@@ -9,6 +9,8 @@ import {
   BadRequestException,
   Delete,
   Query,
+  Put,
+  Req,
 } from '@nestjs/common';
 import { PostService } from './posts.service';
 import { JwtAuthGuard } from '../jwtstrategy/jwt-auth.guard';
@@ -34,6 +36,10 @@ export class commentController {
 
   @Post(':id')
   @UseGuards(JwtAuthGuard)
+  @ApiOperation({
+    summary:
+      'Có 2 thông báo socket! 1 thông báo đến chủ Post và 1 đến chủ cmt nếu đây là childComment',
+  })
   @ApiParam({ name: 'id', description: 'ID của bài viết', type: String })
   @ApiBearerAuth()
   @ApiResponse({
@@ -77,29 +83,6 @@ export class commentController {
     const comment = new Types.ObjectId(commentId);
     return this.postService.deleteComment(user, comment);
   }
-
-  // @Post(':id/reply-To-Comment')
-  // @UseGuards(JwtAuthGuard)
-  // @ApiBearerAuth()
-  // @ApiParam({ name: 'id', description: 'ID của root comment', type: String })
-  // @ApiOperation({ summary: 'Phản hồi lại một bình luận' })
-  // @ApiResponse({
-  //   status: 201,
-  //   description:
-  //     'bạn đã phản hồi lại một bình luận thành công. Bạn nhận về commentID của bình luận con bạn vừa comment',
-  // })
-  // @ApiResponse({
-  //   status: 401,
-  //   description: 'Bạn cần đăng nhập trước khi bình luận',
-  // })
-  // async replyToComment(
-  //   @Param('id') commentId: string,
-  //   @Body() contentreply: CreatePostDto,
-  // ) {
-  //   const comment = new Types.ObjectId(commentId);
-  //   const content = contentreply;
-  //   return this.postService.responseComment(comment, content);
-  // }
 
   //phân trang
   @Get(':id/rootComments')
@@ -158,5 +141,30 @@ export class commentController {
   async getChildComments(@Param('id') rootCommentId: string) {
     const rootComment = new Types.ObjectId(rootCommentId);
     return this.postService.getAllChildComments(rootComment);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Put(':commentId')
+  @ApiBearerAuth()
+  @ApiParam({
+    name: 'commentId',
+    description: 'ID của bình luận cần chỉnh sửa',
+    type: String,
+  })
+  @ApiBody({
+    description: 'Nội dung bình luận mới cần cập nhật',
+    type: CreatePostDto,
+  })
+  async updatePost(
+    @Req() req,
+    @Param('commentId') commentId: string,
+    @Body('content') updatedContent: string,
+  ) {
+    const userId = req.user.sub;
+    return await this.postService.updateComment(
+      new Types.ObjectId(userId),
+      new Types.ObjectId(commentId),
+      updatedContent,
+    );
   }
 }
