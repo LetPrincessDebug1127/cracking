@@ -5,9 +5,9 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 
 import { PostController } from './posts.controller';
 import { PostService } from './posts.service';
-import { Post, PostSchema } from '../modelsNosql/posts.schema';
-import { User, UserSchema } from '../modelsNosql/user.schema';
-import { Comment, CommentSchema } from '../modelsNosql/comments.schema';
+import { Post, PostSchema } from '../models/posts.schema';
+import { User, UserSchema } from '../models/user.schema';
+import { Comment, CommentSchema } from '../models/comments.schema';
 import { commentController } from './comments.controller';
 import { SocketModule } from '../notifications/events.module';
 // import { NotificationsController } from '../notifications/events.controller';

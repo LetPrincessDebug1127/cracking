@@ -1,12 +1,12 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { Post } from '../modelsNosql/posts.schema';
+import { Post } from '../models/posts.schema';
 import { CreatePostDto } from '../dto.all.ts/create-post.dto';
 import { JwtService } from '@nestjs/jwt';
 import { Types } from 'mongoose';
-import { User } from '../modelsNosql/user.schema';
-import { Comment } from '../modelsNosql/comments.schema';
+import { User } from '../models/user.schema';
+import { Comment } from '../models/comments.schema';
 import { NotificationsGateway } from '../notifications/events.gateway';
 
 @Injectable()

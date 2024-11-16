@@ -7,4 +7,4 @@ import { PasiScore } from './pasi.scores';
   providers: [PasiScore],
   exports: [PasiScore],
 })
-export class SeverityModule {}
+export class ScoreModule {}

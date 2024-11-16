@@ -10,7 +10,8 @@ import { UsersModule } from './modules/users/auth/users.module';
 import { AuthModule } from './modules/firebase/firebase.module';
 import { PostsModule } from './modules/posts/posts.module';
 import { SocketModule } from './modules/notifications/events.module';
-import { SeverityModule } from './modules/severity/severity.module';
+import { ScoreModule } from './modules/secretScores/severity.module';
+import { SeverityProfileModule } from './modules/severity /severity.module';
 
 @Module({
   imports: [
@@ -33,7 +34,8 @@ import { SeverityModule } from './modules/severity/severity.module';
     AuthModule,
     PostsModule,
     SocketModule,
-    SeverityModule,
+    ScoreModule,
+    SeverityProfileModule,
   ],
 
   controllers: [AppController],
@@ -42,7 +44,8 @@ import { SeverityModule } from './modules/severity/severity.module';
     AuthModule,
     PostsModule,
     SocketModule,
-    SeverityModule,
+    ScoreModule,
+    SeverityProfileModule,
   ],
 })
 export class AppModule {}
