@@ -9,7 +9,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import * as bcrypt from 'bcrypt';
 import * as speakeasy from 'speakeasy';
-import { User } from '../../models/user.schema';
+import { User } from '../../modelsNosql/user.schema';
 import { CreateUserDto } from '../../dto.all.ts/register.dto';
 import { ResetPasswordDto } from '../../dto.all.ts/reset-password.dto';
 import { Types } from 'mongoose';
