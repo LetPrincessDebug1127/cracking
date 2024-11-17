@@ -20,9 +20,9 @@ export class CreateAvailableTaskDto {
   @ApiProperty({
     description:
       'The description of the available task, containing title and content',
-    type: String,
     example: 'ăn cá thu',
   })
+  @IsString()
   description: string;
 
   @ApiProperty({
@@ -32,24 +32,14 @@ export class CreateAvailableTaskDto {
   })
   @IsEnum(['standard', 'mild'])
   difficulty: string;
-
-  @ApiProperty({
-    description: 'The points awarded for completing the task',
-    example: 1,
-    required: false,
-    default: 1,
-  })
-  @IsOptional()
-  @IsNumber()
-  points?: number;
 }
-
+// field update cho tất cả là OPTIONAL
 export class UpdateAvailableTaskDto {
   @ApiProperty({
     description: 'The kind of the available task',
     enum: ['food', 'beverage'],
     example: 'food',
-    required: false, // Optional field for update
+    required: false,
   })
   @IsOptional()
   @IsString()
@@ -75,14 +65,4 @@ export class UpdateAvailableTaskDto {
   @IsOptional()
   @IsEnum(['standard', 'mild'])
   difficulty?: string;
-
-  @ApiProperty({
-    description: 'The points awarded for completing the task',
-    example: 1,
-    required: false,
-    default: 1,
-  })
-  @IsOptional()
-  @IsNumber()
-  points?: number;
 }

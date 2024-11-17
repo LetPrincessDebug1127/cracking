@@ -7,7 +7,7 @@ import { UpdateAvailableTaskDto } from '../dto.all.ts/availableTasks.dto';
 import { Types } from 'mongoose';
 
 @Injectable()
-export class TaskService {
+export class TaskAdminService {
   constructor(
     @InjectModel(AvailableTask.name)
     private readonly taskModel: Model<AvailableTask>,
