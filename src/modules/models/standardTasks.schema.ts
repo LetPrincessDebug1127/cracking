@@ -1,16 +1,22 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import * as mongoose from 'mongoose';
-import { Types } from 'mongoose';
+import { Types, Document } from 'mongoose';
 
 @Schema({ timestamps: true })
-export class dailyTasksSevere extends mongoose.Document {
+export class StandardDailyTask extends mongoose.Document {
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true })
   user_id: Types.ObjectId;
 
-  @Prop({ type: String, required: true })
-  tasks: string;
+  @Prop({
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'AvailableTask',
+    required: true,
+  })
+  task_id: Types.ObjectId;
 
   @Prop({ type: Boolean, required: true, default: false })
   completed: boolean;
 }
-export const dailyTasksSchema = SchemaFactory.createForClass(dailyTasksSevere);
+
+export const StandardDailyTaskSchema =
+  SchemaFactory.createForClass(StandardDailyTask);
