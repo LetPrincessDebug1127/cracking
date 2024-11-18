@@ -25,9 +25,9 @@ import {
   ApiOperation,
 } from '@nestjs/swagger';
 import { Types } from 'mongoose';
-import { RolesGuard } from '../users/auth/role-admin/roles';
-import { UserRole } from '../users/auth/role-admin/user-role.enum';
-import { Roles } from '../users/auth/role-admin/role.decorator';
+import { RolesGuard } from '../role-admin/roles';
+import { UserRole } from '../role-admin/user-role.enum';
+import { Roles } from '../role-admin/role.decorator';
 import { PaginationQueryDto } from '../dto.all.ts/PaginationQueryDto';
 
 @ApiTags('Posts')

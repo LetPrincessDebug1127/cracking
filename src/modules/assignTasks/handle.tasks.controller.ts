@@ -25,9 +25,9 @@ import { JwtAuthGuard } from '../jwtstrategy/jwt-auth.guard';
 import { CreateAvailableTaskDto } from '../dto.all.ts/availableTasks.dto';
 import { UpdateAvailableTaskDto } from '../dto.all.ts/availableTasks.dto';
 import { TaskAdminService } from './tasks.management.service';
-import { RolesGuard } from '../users/auth/role-admin/roles';
-import { UserRole } from '../users/auth/role-admin/user-role.enum';
-import { Roles } from '../users/auth/role-admin/role.decorator';
+import { RolesGuard } from '../role-admin/roles';
+import { UserRole } from '../role-admin/user-role.enum';
+import { Roles } from '../role-admin/role.decorator';
 import { TaskStatusDto } from '../dto.all.ts/status.dto';
 
 @ApiTags('Daily Tasks')

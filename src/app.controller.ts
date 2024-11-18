@@ -9,10 +9,10 @@ import {
 import { ApiTags, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
 import { AppService } from './app.service';
 import { JwtAuthGuard } from './modules/jwtstrategy/jwt-auth.guard';
-import { RolesGuard } from './modules/users/auth/role-admin/roles';
-import { UserRole } from './modules/users/auth/role-admin/user-role.enum';
+import { RolesGuard } from './modules/role-admin/roles';
+import { UserRole } from './modules/role-admin/user-role.enum';
 
-import { Roles } from './modules/users/auth/role-admin/role.decorator';
+import { Roles } from './modules/role-admin/role.decorator';
 
 //req.user là cơ chế đặc biệt của jwtAuthGuard, sau khi validate payload nó auto gán vào req.user luôn
 

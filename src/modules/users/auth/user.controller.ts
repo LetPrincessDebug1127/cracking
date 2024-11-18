@@ -26,10 +26,10 @@ import { Request } from 'express';
 import { AuthService } from './refreshToken.service';
 import { RefreshTokenDto } from './refresh-token.dto';
 import { ResetPasswordDto } from '../../dto.all.ts/reset-password.dto';
-import { RolesGuard } from './role-admin/roles';
-import { UserRole } from './role-admin/user-role.enum';
+import { RolesGuard } from '../../role-admin/roles';
+import { UserRole } from '../../role-admin/user-role.enum';
 
-import { Roles } from './role-admin/role.decorator';
+import { Roles } from '../../role-admin/role.decorator';
 @ApiTags('users')
 @Controller('users')
 export class UsersController {

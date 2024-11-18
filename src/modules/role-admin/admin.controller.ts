@@ -15,9 +15,9 @@ import {
   ApiTags,
   ApiBody,
 } from '@nestjs/swagger';
-import { UsersService } from '../users.service';
-import { CreateUserDto } from '../../../dto.all.ts/register.dto';
-import { JwtAuthGuard } from '../../../jwtstrategy/jwt-auth.guard';
+import { UsersService } from '../users/auth/users.service';
+import { CreateUserDto } from '../dto.all.ts/register.dto';
+import { JwtAuthGuard } from '../jwtstrategy/jwt-auth.guard';
 import { Roles } from './role.decorator';
 import { RolesGuard } from './roles';
 import { UserRole } from './user-role.enum';
