@@ -1,29 +1,12 @@
-import {
-  Controller,
-  Post,
-  Req,
-  Param,
-  HttpException,
-  HttpStatus,
-  UseGuards,
-  Get,
-  Query,
-  Body,
-  Put,
-  Delete,
-} from '@nestjs/common';
+import { Controller, Post, Req, UseGuards, Query } from '@nestjs/common';
 import { Types } from 'mongoose';
 import {
-  ApiBody,
   ApiResponse,
   ApiTags,
   ApiBearerAuth,
-  ApiParam,
   ApiOperation,
 } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../jwtstrategy/jwt-auth.guard';
-import { CreateAvailableTaskDto } from '../dto.all.ts/availableTasks.dto';
-import { UpdateAvailableTaskDto } from '../dto.all.ts/availableTasks.dto';
 import { CalendarService } from './taskHistory.service';
 
 @ApiTags('Calendar')
