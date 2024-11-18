@@ -22,8 +22,8 @@ export class UsersService {
     string,
     { attempts: number; blockUntil: Date }
   >();
-  private readonly MAX_ATTEMPTS = 5;
-  private readonly BLOCK_DURATION = 5 * 60 * 1000;
+  // private readonly MAX_ATTEMPTS = 5;
+  // private readonly BLOCK_DURATION = 5 * 60 * 1000;
   constructor(
     @InjectModel(User.name) private userModel: Model<User>,
     private jwtService: JwtService,
@@ -108,7 +108,8 @@ export class UsersService {
       throw new BadRequestException('Tên tài khoản hoặc mật khẩu không đúng');
     }
   }
-
+  // em với db của e cùng chung 1 múi giờ nhưng 1 ngày nào đó lệch giờ chẳng hạn thì ko dùng như này được , ví dụ : khác nước . Phải dùng múi giờ của db
+  // query theo múi giờ của db
   // LẤY MÃ Ô TÊ PÊ
   async getOtp(
     username: string,

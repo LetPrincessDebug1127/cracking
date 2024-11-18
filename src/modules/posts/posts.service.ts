@@ -131,7 +131,7 @@ export class PostService {
 
   async whoLiked(postId: Types.ObjectId): Promise<string[] | string> {
     const post = await this.postModel
-      .findById(postId)
+      .findById(postId) //find thì nó return array rồi nên không cần assertion type là mảng User [], còn này findById
       .populate<{ likedBy: User[] }>('likedBy', 'username')
       .exec();
 

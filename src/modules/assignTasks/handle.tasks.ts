@@ -24,17 +24,17 @@ export class TaskService {
   async completeTaskStatus(
     userId: Types.ObjectId,
     taskId: Types.ObjectId,
-    completed: string,
+    status: string,
   ) {
     const task = await this.taskModel.findById(taskId);
     if (!task) throw new NotFoundException('Task không tồn tại');
 
-    if (completed === 'completed') {
+    if (status === 'completed') {
       // Tạo task hoàn thành
       await this.standardTasksModel.create({
         user_id: userId,
         task_id: taskId,
-        completed,
+        status,
       });
 
       // Tăng sunPoints
@@ -52,11 +52,10 @@ export class TaskService {
       }
     }
 
-    return { message: `Task status cập nhật thành ${completed}.` };
+    return { message: `Task status cập nhật thành ${status}.` };
   }
 
-  // async getTaskStatus(userId: string, taskId: string): Promise<string> {
-  //   const task = await this.taskModel.findOne({ user_id: userId, task_id: taskId });
-  //   return task ? task.completed : 'todo';  // Return 'todo' if no task found
+  // async getTaskHistory(userId: string): Promise<{}> {
+
   // }
 }

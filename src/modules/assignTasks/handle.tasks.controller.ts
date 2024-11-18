@@ -51,10 +51,10 @@ export class StandardDailyTaskController {
   async getTaskStatus(
     @Req() req,
     @Param('taskId') taskId: Types.ObjectId,
-    completed: string,
+    status: string,
   ) {
     const user_id = new Types.ObjectId(req.user.userId);
-    return this.taskService.completeTaskStatus(user_id, taskId, completed);
+    return this.taskService.completeTaskStatus(user_id, taskId, status);
   }
 
   @Post()

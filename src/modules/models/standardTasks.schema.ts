@@ -24,7 +24,10 @@ export class StandardDailyTask extends mongoose.Document {
     required: true,
     default: 'todo',
   })
-  completed: string;
+  status: ['todo', 'completed']; // sửa lại là status
+
+  @Prop({ type: Date, required: false })
+  task_date: Date;
 }
 
 export const StandardDailyTaskSchema =

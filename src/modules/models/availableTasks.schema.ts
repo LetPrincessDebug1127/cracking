@@ -1,17 +1,17 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
 
-@Schema({ timestamps: true })
+// cái này không cần timestamp
+@Schema()
 export class AvailableTask extends Document {
   @Prop({
     type: String,
     enum: ['food', 'beverage'],
     required: true,
-    unique: true,
   })
-  kind: string;
+  kind: ['food', 'beverage'];
 
-  @Prop({ type: String, required: true })
+  @Prop({ type: String, required: true, unique: true })
   description: string;
 
   @Prop({

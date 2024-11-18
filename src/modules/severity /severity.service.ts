@@ -19,7 +19,7 @@ export class SeverityProfileService {
     severityPercentage: CalculatePasiDto,
   ) {
     const { pasi, percentage } =
-      await this.pasiScoreService.calculatePASI(severityPercentage);
+      this.pasiScoreService.calculatePASI(severityPercentage);
     return await this.severityProfileModel.create({
       user_id: userId,
       severityPercentage: percentage,
