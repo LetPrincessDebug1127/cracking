@@ -13,6 +13,7 @@ import { SocketModule } from './modules/notifications/events.module';
 import { ScoreModule } from './modules/secretScores/severity.module';
 import { SeverityProfileModule } from './modules/severity /severity.module';
 import { TasksManagementModule } from './modules/assignTasks/tasks.module';
+import { CalendarModule } from './modules/calendar/taskHistory.module';
 
 @Module({
   imports: [
@@ -38,6 +39,7 @@ import { TasksManagementModule } from './modules/assignTasks/tasks.module';
     ScoreModule,
     SeverityProfileModule,
     TasksManagementModule,
+    CalendarModule,
   ],
 
   controllers: [AppController],
@@ -49,6 +51,7 @@ import { TasksManagementModule } from './modules/assignTasks/tasks.module';
     ScoreModule,
     SeverityProfileModule,
     TasksManagementModule,
+    CalendarModule,
   ],
 })
 export class AppModule {}

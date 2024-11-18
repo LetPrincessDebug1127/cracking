@@ -10,12 +10,12 @@ import { StandardDailyTask } from '../models/standardTasks.schema';
 import { JwtAuthGuard } from '../jwtstrategy/jwt-auth.guard';
 
 @Injectable()
-export class TaskService {
+export class CalendarService {
   constructor(
     @InjectModel(AvailableTask.name)
     private readonly taskModel: Model<AvailableTask>,
-    @InjectModel(SeverityProfile.name)
-    private readonly severityProfileModel: Model<SeverityProfile>,
+    // @InjectModel(SeverityProfile.name)
+    // private readonly severityProfileModel: Model<SeverityProfile>,
     @InjectModel(StandardDailyTask.name)
     private readonly standardTasksModel: Model<StandardDailyTask>,
   ) {}
