@@ -29,7 +29,8 @@ export class CalendarController {
   })
   @ApiBearerAuth()
   async getTaskByDate(@Req() req, @Query('taskDate') taskDate: Date) {
+    const date = new Date(taskDate);
     const userId = new Types.ObjectId(req.user.userId);
-    return this.calendarService.getTasksByUserAndDate(userId, taskDate);
+    return this.calendarService.getTasksByUserAndDate(userId, date);
   }
 }

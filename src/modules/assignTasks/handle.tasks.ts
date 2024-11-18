@@ -28,20 +28,20 @@ export class TaskService {
     taskId: Types.ObjectId,
     taskStatusDto: TaskStatusDto,
   ) {
-    // Lấy session để đảm bảo transaction
-    const session: ClientSession = await this.connection.startSession();
+    // Tạo phiên session để thực hiện CRUD với "nhiều" mongoDB document như transation
+    const session: ClientSession = await this.connection.startSession(); //ClientSession là một class type
     session.startTransaction();
 
     try {
-      // Kiểm tra task tồn tại
+      // gán session vào từng thao tác thực hiện trên document nếu có lỗi hay thực thi đc thì commit hoặc roll back cùng nhau
       const task = await this.taskModel.findById(taskId).session(session);
       if (!task) throw new NotFoundException('Task không tồn tại');
 
-      // Lấy trạng thái từ DTO
+      // Lấy trạng thái từ frontend
       const { status } = taskStatusDto;
 
       if (status === 'completed') {
-        // Tạo record task hoàn thành
+        // Vẫn gán session cho logic thứ 2 . Mỗi thao tác có cách gán khác nhau.
         const standardTask = await this.standardTasksModel.create(
           [
             {
@@ -70,6 +70,7 @@ export class TaskService {
         console.log('Updated severity profile:', severityProfile);
 
         // Kiểm tra nếu đạt 30 sunPoints thì giảm severityPercentage
+        //Muốn percentage trừ đi 0.5 nhưng không muốn nó nhỏ hơn 0
         if (severityProfile.sunPoints >= 30) {
           severityProfile.sunPoints = 0;
           severityProfile.severityPercentage = Math.max(
