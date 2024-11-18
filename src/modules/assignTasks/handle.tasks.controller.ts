@@ -28,6 +28,7 @@ import { TaskAdminService } from './tasks.management.service';
 import { RolesGuard } from '../users/auth/role-admin/roles';
 import { UserRole } from '../users/auth/role-admin/user-role.enum';
 import { Roles } from '../users/auth/role-admin/role.decorator';
+import { TaskStatusDto } from '../dto.all.ts/status.dto';
 
 @ApiTags('Daily Tasks')
 @Controller('tasks')
@@ -36,11 +37,16 @@ export class StandardDailyTaskController {
     private readonly taskService: TaskService,
     private readonly taskTableService: TaskAdminService,
   ) {}
-
-  @Post('status')
+  @Post(':taskId/status') // Đảm bảo route có :taskId
   @UseGuards(JwtAuthGuard)
+  @ApiBody({ type: TaskStatusDto })
+  @ApiParam({
+    name: 'taskId', // Đặt tên tham số chính xác
+    description: 'ID của task cần hoàn thành',
+    type: String,
+  })
   @ApiOperation({
-    summary: 'Ấn complete daily tasks',
+    summary: 'Daily Tasks',
   })
   @ApiResponse({ status: 201, description: 'Đã completed thành công.' })
   @ApiResponse({
@@ -50,11 +56,12 @@ export class StandardDailyTaskController {
   @ApiBearerAuth()
   async getTaskStatus(
     @Req() req,
-    @Param('taskId') taskId: Types.ObjectId,
-    status: string,
+    @Param('taskId') taskId: string, // Không cần dấu ':'
+    @Body() taskStatusDto: TaskStatusDto,
   ) {
     const user_id = new Types.ObjectId(req.user.userId);
-    return this.taskService.completeTaskStatus(user_id, taskId, status);
+    const task_Id = new Types.ObjectId(taskId);
+    return this.taskService.completeTaskStatus(user_id, task_Id, taskStatusDto);
   }
 
   @Post()
