@@ -1,5 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { FirebaseAdminService } from '../firebase.service'; // Đảm bảo import đúng đường dẫn
+import { FirebaseAdminService } from '../LoginWgg/firebase.service'; // Đảm bảo import đúng đường dẫn
 import * as admin from 'firebase-admin';
 
 @Injectable()

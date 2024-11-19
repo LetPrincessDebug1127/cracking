@@ -2,8 +2,8 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { AvailableTask } from '../models/availableTasks.schema';
-import { CreateAvailableTaskDto } from '../dto.all.ts/availableTasks.dto';
-import { UpdateAvailableTaskDto } from '../dto.all.ts/availableTasks.dto';
+import { CreateAvailableTaskDto } from '../dto.all.ts/tasks/availableTasks.dto';
+import { UpdateAvailableTaskDto } from '../dto.all.ts/tasks/availableTasks.dto';
 import { Types } from 'mongoose';
 
 @Injectable()

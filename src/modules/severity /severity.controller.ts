@@ -8,7 +8,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { SeverityProfileService } from './severity.service';
-import { JwtAuthGuard } from '../jwtstrategy/jwt-auth.guard';
+import { JwtAuthGuard } from '../../guards/jwt-auth.guard';
 import {
   ApiBody,
   ApiResponse,
@@ -16,7 +16,7 @@ import {
   ApiBearerAuth,
   ApiOperation,
 } from '@nestjs/swagger';
-import { CalculatePasiDto } from '../dto.all.ts/pasi.dto';
+import { CalculatePasiDto } from '../dto.all.ts/severityProfile/pasi.dto';
 import { Types } from 'mongoose';
 
 @ApiTags('Severity Profiles')

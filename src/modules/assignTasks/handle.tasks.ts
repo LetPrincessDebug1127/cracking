@@ -2,13 +2,13 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel, InjectConnection } from '@nestjs/mongoose';
 import { Model, ClientSession, Connection } from 'mongoose';
 import { AvailableTask } from '../models/availableTasks.schema';
-import { CreateAvailableTaskDto } from '../dto.all.ts/availableTasks.dto';
-import { UpdateAvailableTaskDto } from '../dto.all.ts/availableTasks.dto';
+import { CreateAvailableTaskDto } from '../dto.all.ts/tasks/availableTasks.dto';
+import { UpdateAvailableTaskDto } from '../dto.all.ts/tasks/availableTasks.dto';
 import { SeverityProfile } from '../models/severity.profile';
 import { Types } from 'mongoose';
 import { StandardDailyTask } from '../models/standardTasks.schema';
-import { JwtAuthGuard } from '../jwtstrategy/jwt-auth.guard';
-import { TaskStatusDto } from '../dto.all.ts/status.dto';
+import { JwtAuthGuard } from '../../guards/jwt-auth.guard';
+import { TaskStatusDto } from '../dto.all.ts/tasks/status.dto';
 
 @Injectable()
 export class TaskService {

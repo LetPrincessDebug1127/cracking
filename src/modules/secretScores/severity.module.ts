@@ -1,9 +1,8 @@
 import { Module } from '@nestjs/common';
-import { PasiController } from './severity.controller';
 import { PasiScore } from './pasi.scores';
 
 @Module({
-  controllers: [PasiController],
+  controllers: [],
   providers: [PasiScore],
   exports: [PasiScore],
 })

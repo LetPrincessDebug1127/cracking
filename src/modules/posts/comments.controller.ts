@@ -13,8 +13,8 @@ import {
   Req,
 } from '@nestjs/common';
 import { PostService } from './posts.service';
-import { JwtAuthGuard } from '../jwtstrategy/jwt-auth.guard';
-import { CreatePostDto } from '../dto.all.ts/create-post.dto';
+import { JwtAuthGuard } from '../../guards/jwt-auth.guard';
+import { CreatePostDto } from '../dto.all.ts/posts/create-post.dto';
 import {
   ApiBody,
   ApiResponse,
@@ -24,10 +24,10 @@ import {
   ApiOperation,
 } from '@nestjs/swagger';
 import { Types } from 'mongoose';
-import { RolesGuard } from '../role-admin/roles';
-import { UserRole } from '../role-admin/user-role.enum';
+import { RolesGuard } from '../../guards/roles';
+import { UserRole } from '../../shared/enum/user-role.enum';
 import { Roles } from '../role-admin/role.decorator';
-import { PaginationQueryDto } from '../dto.all.ts/PaginationQueryDto';
+import { PaginationQueryDto } from '../dto.all.ts/posts/PaginationQueryDto';
 
 @ApiTags('Comments')
 @Controller('Comments')

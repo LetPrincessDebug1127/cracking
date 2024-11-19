@@ -9,21 +9,19 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import * as bcrypt from 'bcrypt';
 import * as speakeasy from 'speakeasy';
-import { User } from '../../models/user.schema';
-import { CreateUserDto } from '../../dto.all.ts/register.dto';
-import { ResetPasswordDto } from '../../dto.all.ts/reset-password.dto';
+import { User } from '../models/user.schema';
+import { CreateUserDto } from '../dto.all.ts/users/register.dto';
+import { ResetPasswordDto } from '../dto.all.ts/users/reset-password.dto';
 import { Types } from 'mongoose';
+import { validateUserInput } from '../../shared/utils/validateUserInput';
+import { isRateLimited } from '../../shared/utils/rate-limit.util';
 
 @Injectable()
 export class UsersService {
-  // tạo một ctdl để lưu username và số lần ng đó đăng nhập thất bại, cũng như là khi nào người đó được unblock
-  // mình dùng Map() là một data structure của js để lưu cặp key value nó cung cấp các method như get và set để lấy ra và thay đổi value của key
   private failedAttempts = new Map<
     string,
     { attempts: number; blockUntil: Date }
   >();
-  // private readonly MAX_ATTEMPTS = 5;
-  // private readonly BLOCK_DURATION = 5 * 60 * 1000;
   constructor(
     @InjectModel(User.name) private userModel: Model<User>,
     private jwtService: JwtService,
@@ -32,19 +30,10 @@ export class UsersService {
   async register(createUserDto: CreateUserDto): Promise<string> {
     const { username, password, securityAnswer } = createUserDto;
 
-    const usernameRegex = /^.{5,}$/;
-    const passwordRegex = /^(?=.*[A-Z])(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{5,}$/;
-
-    if (!usernameRegex.test(username) || !passwordRegex.test(password)) {
-      throw new BadRequestException(
-        'Tài khoản & mật khẩu phải có ít nhất 5 ký tự, bao gồm một chữ cái viết hoa và một ký tự đặc biệt.',
-      );
-    }
+    validateUserInput(username, password);
 
     const existingUser = await this.userModel.findOne({ username });
-    if (existingUser) {
-      throw new BadRequestException('Tài khoản đã tồn tại');
-    }
+    if (existingUser) throw new BadRequestException('Tài khoản đã tồn tại');
 
     const hashedPassword = await bcrypt.hash(password, 10);
     const hashedAnswer = await bcrypt.hash(securityAnswer.toString(), 10);
@@ -61,19 +50,36 @@ export class UsersService {
     return `Chúc mừng ${newUser.username}, bạn đã đăng ký thành công với vai trò user!`;
   }
 
-  async validateUser(username: string, password: string): Promise<any> {
+  private handleFailedAttempt(username: string): void {
     const MAX_ATTEMPTS = 5;
-    const BLOCK_DURATION = 5 * 60 * 1000;
+    const BLOCK_DURATION = 5 * 60 * 1000; // 5 phút
     const now = new Date();
 
-    // Map() lúc này chưa có username mà get() thì nó return undefined => lúc này userAttemptData sẽ falsy
     let userAttemptData = this.failedAttempts.get(username);
 
-    if (userAttemptData && userAttemptData.blockUntil > now) {
+    if (!userAttemptData) {
+      userAttemptData = { attempts: 1, blockUntil: null };
+    }
+
+    if (userAttemptData.blockUntil && userAttemptData.blockUntil > now) {
       throw new BadRequestException(
         `Tài khoản ${username} bị tạm khóa do nhập sai quá nhiều lần. Vui lòng thử lại sau 5 phút.`,
       );
     }
+
+    userAttemptData.attempts += 1;
+
+    if (userAttemptData.attempts >= MAX_ATTEMPTS) {
+      userAttemptData.blockUntil = new Date(now.getTime() + BLOCK_DURATION);
+    }
+
+    this.failedAttempts.set(username, userAttemptData);
+  }
+
+  async validateUser(username: string, password: string): Promise<any> {
+    const now = new Date();
+
+    this.handleFailedAttempt(username);
 
     const user = await this.userModel.findOne({ username });
 
@@ -93,24 +99,11 @@ export class UsersService {
         refresh_token: refreshToken,
       };
     } else {
-      if (!userAttemptData) {
-        userAttemptData = { attempts: 1, blockUntil: null };
-      } else {
-        userAttemptData.attempts += 1;
-      }
-
-      if (userAttemptData.attempts >= MAX_ATTEMPTS) {
-        userAttemptData.blockUntil = new Date(now.getTime() + BLOCK_DURATION);
-      }
-
-      this.failedAttempts.set(username, userAttemptData);
-
       throw new BadRequestException('Tên tài khoản hoặc mật khẩu không đúng');
     }
   }
-  // em với db của e cùng chung 1 múi giờ nhưng 1 ngày nào đó lệch giờ chẳng hạn thì ko dùng như này được , ví dụ : khác nước . Phải dùng múi giờ của db
-  // query theo múi giờ của db
-  // LẤY MÃ Ô TÊ PÊ
+
+  // LẤY MÃ Ô TÊ PÊ theo múi giờ csdl
   async getOtp(
     username: string,
     securityAnswer: number,
@@ -119,18 +112,15 @@ export class UsersService {
     if (!user) {
       throw new UnauthorizedException('Người dùng không tồn tại');
     }
-    // Check rate limit
+
+    // Check rate limit with UTC time
     const rateLimitMinutes = 1;
-    const now = new Date();
-    if (
-      user.lastOtpRequest &&
-      new Date(user.lastOtpRequest.getTime() + rateLimitMinutes * 60 * 1000) >
-        now
-    ) {
-      throw new BadRequestException(
-        `Bạn chỉ có thể yêu cầu mã OTP mỗi ${rateLimitMinutes} phút`,
-      );
+    const now = Date.now();
+
+    if (isRateLimited(user.lastOtpRequest, 1)) {
+      throw new BadRequestException('Bạn chỉ có thể yêu cầu mã OTP mỗi 1 phút');
     }
+
     if (user && user.answer_security) {
       const isAnswerCorrect = await bcrypt.compare(
         securityAnswer.toString(),
@@ -144,8 +134,8 @@ export class UsersService {
         });
 
         user.otp = otp;
-        user.otpExpires = new Date(Date.now() + 5 * 60 * 1000);
-        user.lastOtpRequest = now;
+        user.otpExpires = new Date(now + 5 * 60 * 1000);
+        user.lastOtpRequest = new Date(now);
 
         await user.save();
 
@@ -153,13 +143,14 @@ export class UsersService {
           message: 'OTP đã được gửi đến bạn ♡',
           otp,
         };
-      } else if (!user && !user.answer_security) {
+      } else if (!user.answer_security) {
         throw new Error('Câu trả lời không chính xác');
       }
     }
 
     return null;
   }
+
   // sẽ sửa type any thành string sau
   async verifyOtp(username: string, otp: string): Promise<any> {
     const user = await this.userModel.findOne({ username });

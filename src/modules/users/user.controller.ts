@@ -16,20 +16,20 @@ import {
   ApiBearerAuth,
 } from '@nestjs/swagger';
 import { UsersService } from './users.service';
-import { JwtAuthGuard } from '../../jwtstrategy/jwt-auth.guard';
-import { CreateUserDto } from '../../dto.all.ts/register.dto';
-import { LoginUserDto } from '../../dto.all.ts/login.dto';
-import { SecurityAnswerUserDto } from '../../dto.all.ts/security.answer.dto';
+import { JwtAuthGuard } from '../../guards/jwt-auth.guard';
+import { CreateUserDto } from '../dto.all.ts/users/register.dto';
+import { LoginUserDto } from '../dto.all.ts/users/login.dto';
+import { SecurityAnswerUserDto } from '../dto.all.ts/users/security.answer.dto';
 
-import { JwtRefreshTokenGuard } from '../../jwtstrategy/jwt-refresh-token.guard';
+import { JwtRefreshTokenGuard } from '../../guards/jwt-refresh-token.guard';
 import { Request } from 'express';
 import { AuthService } from './refreshToken.service';
-import { RefreshTokenDto } from './refresh-token.dto';
-import { ResetPasswordDto } from '../../dto.all.ts/reset-password.dto';
-import { RolesGuard } from '../../role-admin/roles';
-import { UserRole } from '../../role-admin/user-role.enum';
+import { RefreshTokenDto } from '../dto.all.ts/users/refresh-token.dto';
+import { ResetPasswordDto } from '../dto.all.ts/users/reset-password.dto';
+import { RolesGuard } from '../../guards/roles';
+import { UserRole } from '../../shared/enum/user-role.enum';
 
-import { Roles } from '../../role-admin/role.decorator';
+import { Roles } from '../role-admin/role.decorator';
 @ApiTags('users')
 @Controller('users')
 export class UsersController {

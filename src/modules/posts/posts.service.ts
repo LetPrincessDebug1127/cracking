@@ -2,7 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Post } from '../models/posts.schema';
-import { CreatePostDto } from '../dto.all.ts/create-post.dto';
+import { CreatePostDto } from '../dto.all.ts/posts/create-post.dto';
 import { JwtService } from '@nestjs/jwt';
 import { Types } from 'mongoose';
 import { User } from '../models/user.schema';

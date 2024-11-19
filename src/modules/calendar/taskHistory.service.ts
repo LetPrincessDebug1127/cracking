@@ -2,12 +2,12 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { AvailableTask } from '../models/availableTasks.schema';
-import { CreateAvailableTaskDto } from '../dto.all.ts/availableTasks.dto';
-import { UpdateAvailableTaskDto } from '../dto.all.ts/availableTasks.dto';
+import { CreateAvailableTaskDto } from '../dto.all.ts/tasks/availableTasks.dto';
+import { UpdateAvailableTaskDto } from '../dto.all.ts/tasks/availableTasks.dto';
 import { SeverityProfile } from '../models/severity.profile';
 import { Types } from 'mongoose';
 import { StandardDailyTask } from '../models/standardTasks.schema';
-import { JwtAuthGuard } from '../jwtstrategy/jwt-auth.guard';
+import { JwtAuthGuard } from '../../guards/jwt-auth.guard';
 
 @Injectable()
 export class CalendarService {

@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { WsException } from '@nestjs/websockets';
-
+//Kiểm tra sự tồn tại của token trong header => middleware
 @Injectable()
 export class WebSocketAuthGuard {
   constructor(private jwtService: JwtService) {}

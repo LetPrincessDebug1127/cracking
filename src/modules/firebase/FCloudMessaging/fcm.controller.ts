@@ -1,7 +1,7 @@
 import { Controller, Post, Body, BadRequestException } from '@nestjs/common';
 import { FcmService } from './fcm.service';
 import { ApiTags, ApiOperation, ApiResponse, ApiBody } from '@nestjs/swagger';
-import { SendNotificationDto } from '../../dto.all.ts/fcm.notification';
+import { SendNotificationDto } from '../../dto.all.ts/notifications/fcm.notification';
 
 @ApiTags('Firebase Cloud Messaging - Notifications')
 @Controller('notifications')

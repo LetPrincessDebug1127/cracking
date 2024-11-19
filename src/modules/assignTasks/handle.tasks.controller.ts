@@ -21,14 +21,14 @@ import {
   ApiParam,
   ApiOperation,
 } from '@nestjs/swagger';
-import { JwtAuthGuard } from '../jwtstrategy/jwt-auth.guard';
-import { CreateAvailableTaskDto } from '../dto.all.ts/availableTasks.dto';
-import { UpdateAvailableTaskDto } from '../dto.all.ts/availableTasks.dto';
+import { JwtAuthGuard } from '../../guards/jwt-auth.guard';
+import { CreateAvailableTaskDto } from '../dto.all.ts/tasks/availableTasks.dto';
+import { UpdateAvailableTaskDto } from '../dto.all.ts/tasks/availableTasks.dto';
 import { TaskAdminService } from './tasks.management.service';
-import { RolesGuard } from '../role-admin/roles';
-import { UserRole } from '../role-admin/user-role.enum';
+import { RolesGuard } from '../../guards/roles';
+import { UserRole } from '../../shared/enum/user-role.enum';
 import { Roles } from '../role-admin/role.decorator';
-import { TaskStatusDto } from '../dto.all.ts/status.dto';
+import { TaskStatusDto } from '../dto.all.ts/tasks/status.dto';
 
 @ApiTags('Daily Tasks')
 @Controller('tasks')

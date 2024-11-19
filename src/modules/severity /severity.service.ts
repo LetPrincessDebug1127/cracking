@@ -4,7 +4,7 @@ import { SeverityProfile } from '../models/severity.profile';
 import { Injectable } from '@nestjs/common';
 import { Types } from 'mongoose';
 import { PasiScore } from '../secretScores/pasi.scores';
-import { CalculatePasiDto } from '../dto.all.ts/pasi.dto';
+import { CalculatePasiDto } from '../dto.all.ts/severityProfile/pasi.dto';
 
 @Injectable()
 export class SeverityProfileService {

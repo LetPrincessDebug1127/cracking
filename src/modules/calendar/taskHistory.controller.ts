@@ -6,7 +6,7 @@ import {
   ApiBearerAuth,
   ApiOperation,
 } from '@nestjs/swagger';
-import { JwtAuthGuard } from '../jwtstrategy/jwt-auth.guard';
+import { JwtAuthGuard } from '../../guards/jwt-auth.guard';
 import { CalendarService } from './taskHistory.service';
 
 @ApiTags('Calendar')
