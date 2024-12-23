@@ -51,7 +51,8 @@ export class UsersController {
   })
   @ApiBody({ type: CreateUserDto })
   async register(@Body() createUserDto: CreateUserDto) {
-    return this.usersService.register(createUserDto);
+     const result = await this.usersService.register(createUserDto);
+     return { message: result };
   }
 
   @Post('login')

@@ -27,7 +27,7 @@ export class UsersService {
     private jwtService: JwtService,
   ) {}
 
-  async register(createUserDto: CreateUserDto): Promise<string> {
+  async register(createUserDto: CreateUserDto): Promise<Object> {
     const { username, password, securityAnswer } = createUserDto;
 
     validateUserInput(username, password);
@@ -47,7 +47,7 @@ export class UsersService {
 
     await newUser.save();
 
-    return `Chúc mừng ${newUser.username}, bạn đã đăng ký thành công với vai trò user!`;
+    return { message: `Chúc mừng ${newUser.username}, bạn đã đăng ký thành công với vai trò user!` };
   }
 
   private handleFailedAttempt(username: string): void {
