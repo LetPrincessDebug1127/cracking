@@ -4,9 +4,8 @@ import {
   Body,
   UseGuards,
   Get,
-  UnauthorizedException,
-  Req,
   Res,
+  UnauthorizedException
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -20,14 +19,12 @@ import { JwtAuthGuard } from '../../guards/jwt-auth.guard';
 import { CreateUserDto } from '../dto.all.ts/users/register.dto';
 import { LoginUserDto } from '../dto.all.ts/users/login.dto';
 import { SecurityAnswerUserDto } from '../dto.all.ts/users/security.answer.dto';
-
-import { JwtRefreshTokenGuard } from '../../guards/jwt-refresh-token.guard';
-import { Request } from 'express';
 import { AuthService } from './refreshToken.service';
 import { RefreshTokenDto } from '../dto.all.ts/users/refresh-token.dto';
 import { ResetPasswordDto } from '../dto.all.ts/users/reset-password.dto';
 import { RolesGuard } from '../../guards/roles';
 import { UserRole } from '../../shared/enum/user-role.enum';
+import { Response } from 'express';
 
 import { Roles } from '../role-admin/role.decorator';
 @ApiTags('users')
@@ -66,17 +63,28 @@ export class UsersController {
       'Đăng nhập thất bại vì các lí do: tài khoản không tồn tại, tài khoản bị khóa vì đăng nhập thất bại quá nhiều lần',
   })
   @ApiBody({ type: LoginUserDto })
-  async login(@Body() loginUserDto: LoginUserDto) {
-    const user = await this.usersService.validateUser(
+  async login(
+    @Body() loginUserDto: LoginUserDto,
+    @Res({ passthrough : true}) response : Response 
+  ) {
+    const tokens = await this.usersService.validateUser(
       loginUserDto.username,
       loginUserDto.password,
     );
     // bên register nó chỉ có 2 errors là existing account hoặc ko đúng định dạng dto thôi, mà existing bên service xử lý rồi con data khớp dto thì controller nhận type đầu vào
-    if (!user) {
+    if (!tokens) {
       throw new UnauthorizedException('Invalid username or password');
     }
 
-    return user;
+    // lưu rf token vào http only
+    response.cookie('refreshToken', tokens.refresh_token, {
+        httpOnly : true,
+        secure:false, //process.env.NODE_ENV === 'production' cho https thôi, not http mà để sau set
+        sameSite: 'strict', //'strict' để Chống CSRF, nào set production rồi chỉnh lại
+        maxAge: 7 * 24 * 60 * 60 * 1000,
+
+    })
+  return { access_token: tokens.access_token };
   }
   @Post('get-otp-forget-password')
   @ApiOperation({
@@ -105,8 +113,8 @@ export class UsersController {
   @ApiResponse({ status: 401, description: 'User not found.' })
   @ApiResponse({ status: 400, description: 'Invalid security answer.' })
   async resetPassword(@Body() resetPasswordDto: ResetPasswordDto) {
-    const message = await this.usersService.resetPassword(resetPasswordDto);
-    return { message };
+    const otp = await this.usersService.resetPassword(resetPasswordDto);
+    return { otp };
   }
   @Post('verify-otp')
   @ApiOperation({ summary: 'Verify OTP for a user' })
@@ -135,7 +143,7 @@ export class UsersController {
   }
   @Post('refresh-token')
   @ApiOperation({
-    summary: 'Chừng nào có FE mình sẽ config rf token vào http cookies sau',
+    summary: '',
   })
   @ApiResponse({
     status: 200,
@@ -146,8 +154,19 @@ export class UsersController {
     description: 'Refresh token payload',
     type: RefreshTokenDto,
   })
-  async refreshToken(@Body() body: { refresh_token: string }) {
-    return this.authService.refreshAccessToken(body.refresh_token);
+  async refreshToken(
+    @Body() body: { refresh_token: string },
+    @Res({ passthrough: true }) response: Response) {
+    
+    const { refresh_token } = body;
+    const tokens = await this.authService.refreshAccessToken(refresh_token);
+    response.cookie('refreshToken', tokens.refresh_token, {
+      httpOnly: true,
+      secure: false, // process.env.NODE_ENV === 'production', 
+      sameSite: 'strict',
+      maxAge: 7 * 24 * 60 * 60 * 1000, // Thời gian hết hạn của refresh token
+    });
+    return { access_token: tokens.access_token };
   }
 
   @UseGuards(JwtAuthGuard)

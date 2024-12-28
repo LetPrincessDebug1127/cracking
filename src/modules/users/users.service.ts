@@ -36,7 +36,7 @@ export class UsersService {
     if (existingUser) throw new BadRequestException('Tài khoản đã tồn tại');
 
     const hashedPassword = await bcrypt.hash(password, 10);
-    const hashedAnswer = await bcrypt.hash(securityAnswer.toString(), 10);
+    const hashedAnswer = await bcrypt.hash(securityAnswer, 10);
 
     const newUser = new this.userModel({
       username,
@@ -106,7 +106,7 @@ export class UsersService {
   // LẤY MÃ Ô TÊ PÊ theo múi giờ csdl
   async getOtp(
     username: string,
-    securityAnswer: number,
+    securityAnswer: string,
   ): Promise<{ message: string; otp: string } | null> {
     const user = await this.userModel.findOne({ username });
     if (!user) {
@@ -123,7 +123,7 @@ export class UsersService {
 
     if (user && user.answer_security) {
       const isAnswerCorrect = await bcrypt.compare(
-        securityAnswer.toString(),
+        securityAnswer,
         user.answer_security,
       );
 
@@ -194,6 +194,7 @@ export class UsersService {
   // reset password (check username, securityAnswer, thế new password vào user.password)
   async resetPassword(resetPasswordDto: ResetPasswordDto): Promise<string> {
     const { username, newPassword, securityAnswer } = resetPasswordDto;
+    const now = Date.now();
 
     const user = await this.userModel.findOne({ username });
     if (!user) {
@@ -212,7 +213,19 @@ export class UsersService {
     user.password = hashedPassword;
     await user.save();
 
-    return 'Mật khẩu của bạn đã được thay đổi thành công!';
+     const otp = speakeasy.totp({
+      secret: process.env.OTP_SECRET,
+      encoding: 'base32',
+    });
+
+    user.otp = otp;
+    user.otpExpires = new Date(now + 5 * 60 * 1000);
+    user.lastOtpRequest = new Date(now);
+
+    await user.save();
+
+
+    return otp;
   }
 
   // Tạo admin

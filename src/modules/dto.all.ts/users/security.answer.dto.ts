@@ -13,9 +13,9 @@ export class SecurityAnswerUserDto {
   @ApiProperty({
     example: 22,
     description:
-      'Ngày sinh người thân yêu để khôi phục tài khoản khi quên mật khẩu ?',
+      'Số Điện Thoại',
   })
-  @IsNumber()
+  @IsString()
   @IsNotEmpty()
-  securityAnswer: number;
+  securityAnswer: string;
 }

@@ -10,6 +10,11 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.setGlobalPrefix('api');
 
+  app.enableCors({
+    origin: 'https://xucyx5s-thungan272003-8081.exp.direct/', 
+    credentials: true,  // Cho phép gửi cookie từ frontend
+  });
+
   app.useGlobalPipes(
     new ValidationPipe({
       transform: true, // Chuyển đổi kiểu dữ liệu
