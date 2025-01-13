@@ -30,8 +30,6 @@ export class User extends Document {
   @Prop({ default: null })
   lockUntil: Date | null;
 
-  @Prop()
-  email: string;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

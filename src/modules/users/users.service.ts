@@ -15,6 +15,10 @@ import { ResetPasswordDto } from '../dto.all.ts/users/reset-password.dto';
 import { Types } from 'mongoose';
 import { validateUserInput } from '../../shared/utils/validateUserInput';
 import { isRateLimited } from '../../shared/utils/rate-limit.util';
+import { RSAUtils } from '../../shared/utils/RSAUtils';
+import { ConfigService } from '@nestjs/config';
+import * as nodemailer from 'nodemailer';
+import * as path from 'path';
 
 @Injectable()
 export class UsersService {
@@ -25,6 +29,7 @@ export class UsersService {
   constructor(
     @InjectModel(User.name) private userModel: Model<User>,
     private jwtService: JwtService,
+    private configService: ConfigService,
   ) {}
 
   async register(createUserDto: CreateUserDto): Promise<Object> {
@@ -36,19 +41,97 @@ export class UsersService {
     if (existingUser) throw new BadRequestException('Tài khoản đã tồn tại');
 
     const hashedPassword = await bcrypt.hash(password, 10);
-    const hashedAnswer = await bcrypt.hash(securityAnswer, 10);
+
+    const encryptedAnswer = RSAUtils.encryptWithPublicKey(securityAnswer, path.join(__dirname, '../../publicKey.pem'));
+
 
     const newUser = new this.userModel({
       username,
       password: hashedPassword,
-      answer_security: hashedAnswer,
+      answer_security: encryptedAnswer,
       role: 'user',
+  
     });
 
     await newUser.save();
 
-    return { message: `Chúc mừng ${newUser.username}, bạn đã đăng ký thành công với vai trò user!` };
+    return {
+      message: `Chúc mừng ${newUser.username}, bạn đã đăng ký thành công với vai trò user!`,
+    };
   }
+
+private async sendOtpToEmail(decryptedAnswer: string, otp: string): Promise<void> {
+  const transporter = nodemailer.createTransport({
+    host: process.env.SMTP_HOST, 
+    port: parseInt(process.env.SMTP_PORT, 10),
+    secure: false, 
+    auth: {
+      user: process.env.SMTP_USER, 
+      pass: process.env.SMTP_PASSWORD, 
+    },
+  });
+
+  const mailOptions = {
+    from: `"Shiso" <${process.env.SMTP_USER}>`, 
+    to: decryptedAnswer, 
+    subject: 'ShiSo sends OTP to you', 
+    text: `Your OTP: ${otp}`, 
+  };
+
+  try {
+    await transporter.sendMail(mailOptions);
+  } catch (error) {
+    console.error('Error sending OTP email:', error);
+    throw new BadRequestException('Không thể gửi email OTP');
+  }
+}
+
+  // LẤY MÃ Ô TÊ PÊ theo múi giờ csdl
+  async getOtp(
+  username: string,
+  securityAnswer: string,
+): Promise<{ message: string; otp: string } | null> {
+  const user = await this.userModel.findOne({ username });
+  if (!user) {
+    throw new UnauthorizedException('Người dùng không tồn tại');
+  }
+
+  // Check rate limit with UTC time
+  const rateLimitMinutes = 1;
+  const now = Date.now();
+
+  if (isRateLimited(user.lastOtpRequest, rateLimitMinutes)) {
+    throw new BadRequestException(
+      `Bạn chỉ có thể yêu cầu mã OTP mỗi ${rateLimitMinutes} phút`,
+    );
+  }
+
+ 
+  const decryptedAnswer = RSAUtils.decryptWithPrivateKey(user.answer_security, path.join(__dirname, '../../privateKey.pem'));
+
+
+  if (securityAnswer.trim() !== decryptedAnswer.trim()) {
+    throw new BadRequestException('Email không chính xác');
+  }
+
+  const otp = speakeasy.totp({
+    secret: process.env.OTP_SECRET,
+    encoding: 'base32',
+  });
+
+  user.otp = otp;
+  user.otpExpires = new Date(now + 5 * 60 * 1000); 
+  user.lastOtpRequest = new Date(now);
+
+  await user.save();
+  await this.sendOtpToEmail(decryptedAnswer, otp); 
+
+  return {
+    message: 'OTP đã được gửi đến email bạn ♡',
+    otp,
+  };
+}
+
 
   private handleFailedAttempt(username: string): void {
     const MAX_ATTEMPTS = 5;
@@ -101,54 +184,6 @@ export class UsersService {
     } else {
       throw new BadRequestException('Tên tài khoản hoặc mật khẩu không đúng');
     }
-  }
-
-  // LẤY MÃ Ô TÊ PÊ theo múi giờ csdl
-  async getOtp(
-    username: string,
-    securityAnswer: string,
-  ): Promise<{ message: string; otp: string } | null> {
-    const user = await this.userModel.findOne({ username });
-    if (!user) {
-      throw new UnauthorizedException('Người dùng không tồn tại');
-    }
-
-    // Check rate limit with UTC time
-    const rateLimitMinutes = 1;
-    const now = Date.now();
-
-    if (isRateLimited(user.lastOtpRequest, 1)) {
-      throw new BadRequestException('Bạn chỉ có thể yêu cầu mã OTP mỗi 1 phút');
-    }
-
-    if (user && user.answer_security) {
-      const isAnswerCorrect = await bcrypt.compare(
-        securityAnswer,
-        user.answer_security,
-      );
-
-      if (isAnswerCorrect) {
-        const otp = speakeasy.totp({
-          secret: process.env.OTP_SECRET,
-          encoding: 'base32',
-        });
-
-        user.otp = otp;
-        user.otpExpires = new Date(now + 5 * 60 * 1000);
-        user.lastOtpRequest = new Date(now);
-
-        await user.save();
-
-        return {
-          message: 'OTP đã được gửi đến bạn ♡',
-          otp,
-        };
-      } else if (!user.answer_security) {
-        throw new Error('Câu trả lời không chính xác');
-      }
-    }
-
-    return null;
   }
 
   // sẽ sửa type any thành string sau
