@@ -92,10 +92,9 @@ export class UsersController {
   })
   @ApiResponse({ status: 200, description: 'OTP sent successfully.' })
   @ApiResponse({ status: 401, description: 'Invalid security answer.' })
-  async getOTP(@Body() securityAnswerUserDto: SecurityAnswerUserDto) {
+  async getOTP(@Body() username: SecurityAnswerUserDto) {
     const result = await this.usersService.getOtp(
-      securityAnswerUserDto.username,
-      securityAnswerUserDto.securityAnswer,
+      username.username
     );
 
     if (!result) {
@@ -133,13 +132,8 @@ export class UsersController {
   async verifyOtp(
     @Body() { username, otp }: { username: string; otp: string },
   ) {
-    const isVerified = await this.usersService.verifyOtp(username, otp);
+    return await this.usersService.verifyOtp(username, otp);
 
-    if (!isVerified) {
-      throw new UnauthorizedException('Invalid OTP');
-    }
-
-    return { message: 'OTP verified successfully' };
   }
   @Post('refresh-token')
   @ApiOperation({

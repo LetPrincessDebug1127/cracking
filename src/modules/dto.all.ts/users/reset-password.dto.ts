@@ -11,9 +11,9 @@ export class ResetPasswordDto {
   newPassword: string;
 
   @ApiProperty({
-    example: 22,
+    example:'newpassword123@gmail.com',
     description:
-      'Ngày sinh người thân yêu để khôi phục tài khoản khi quên mật khẩu ?',
+      'email',
   })
   @IsNumber()
   @IsNotEmpty()

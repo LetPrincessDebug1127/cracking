@@ -31,7 +31,7 @@ export class RSAUtils {
 }
 
   static decryptWithPrivateKey(data: string, privateKeyPath: string): string {
-    const privateKey = fs.readFileSync(privateKeyPath, 'utf8'); // Read the private key from the file
+    const privateKey = fs.readFileSync(privateKeyPath, 'utf8'); 
 
     return crypto
       .privateDecrypt(

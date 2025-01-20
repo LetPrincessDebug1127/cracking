@@ -7,15 +7,5 @@ export class SecurityAnswerUserDto {
     description: 'Tên đăng nhập',
   })
   @IsString()
-  @IsNotEmpty()
-  username: string;
-
-  @ApiProperty({
-    example: 22,
-    description:
-      'Số Điện Thoại',
-  })
-  @IsString()
-  @IsNotEmpty()
-  securityAnswer: string;
+  @IsNotEmpty()  username: string;
 }

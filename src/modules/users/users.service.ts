@@ -16,6 +16,7 @@ import { Types } from 'mongoose';
 import { validateUserInput } from '../../shared/utils/validateUserInput';
 import { isRateLimited } from '../../shared/utils/rate-limit.util';
 import { RSAUtils } from '../../shared/utils/RSAUtils';
+import { google } from 'googleapis';
 import { ConfigService } from '@nestjs/config';
 import * as nodemailer from 'nodemailer';
 import * as path from 'path';
@@ -26,11 +27,23 @@ export class UsersService {
     string,
     { attempts: number; blockUntil: Date }
   >();
+  private oauth2Client;
+
   constructor(
     @InjectModel(User.name) private userModel: Model<User>,
     private jwtService: JwtService,
     private configService: ConfigService,
-  ) {}
+  ) {
+     this.oauth2Client = new google.auth.OAuth2(
+      this.configService.get<string>('GOOGLE_CLIENT_ID'),
+      this.configService.get<string>('GOOGLE_CLIENT_SECRET'),
+      this.configService.get<string>('GOOGLE_REDIRECT_URI') 
+    );
+
+    this.oauth2Client.setCredentials({
+      refresh_token: this.configService.get<string>('GMAIL_REFRESH_TOKEN'),
+    });
+  }
 
   async register(createUserDto: CreateUserDto): Promise<Object> {
     const { username, password, securityAnswer } = createUserDto;
@@ -42,7 +55,7 @@ export class UsersService {
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    const encryptedAnswer = RSAUtils.encryptWithPublicKey(securityAnswer, path.join(__dirname, '../../publicKey.pem'));
+    const encryptedAnswer = RSAUtils.encryptWithPublicKey(securityAnswer, path.join(__dirname, '../../../publicKey.pem'));
 
 
     const newUser = new this.userModel({
@@ -56,41 +69,48 @@ export class UsersService {
     await newUser.save();
 
     return {
-      message: `Chúc mừng ${newUser.username}, bạn đã đăng ký thành công với vai trò user!`,
+      name: newUser.username,
     };
   }
 
-private async sendOtpToEmail(decryptedAnswer: string, otp: string): Promise<void> {
-  const transporter = nodemailer.createTransport({
-    host: process.env.SMTP_HOST, 
-    port: parseInt(process.env.SMTP_PORT, 10),
-    secure: false, 
-    auth: {
-      user: process.env.SMTP_USER, 
-      pass: process.env.SMTP_PASSWORD, 
-    },
-  });
+private async sendOtpToEmail(to: string, subject: string, text: string, html?: string) {
+    try {
+      const accessToken = await this.oauth2Client.getAccessToken();
 
-  const mailOptions = {
-    from: `"Shiso" <${process.env.SMTP_USER}>`, 
-    to: decryptedAnswer, 
-    subject: 'ShiSo sends OTP to you', 
-    text: `Your OTP: ${otp}`, 
-  };
+      const transporter = nodemailer.createTransport({
+        service: 'gmail',
+        auth: {
+          type: 'OAuth2',
+          user: this.configService.get<string>('GMAIL_EMAIL'), 
+          clientId: this.configService.get<string>('GOOGLE_CLIENT_ID'),
+          clientSecret: this.configService.get<string>('GOOGLE_CLIENT_SECRET'),
+          refreshToken: this.configService.get<string>('GMAIL_REFRESH_TOKEN'),
+          accessToken: accessToken.token, 
+        },
+      });
 
-  try {
-    await transporter.sendMail(mailOptions);
-  } catch (error) {
-    console.error('Error sending OTP email:', error);
-    throw new BadRequestException('Không thể gửi email OTP');
-  }
+      // Email options
+      const mailOptions = {
+        from: `"Shiso" <${this.configService.get<string>('GMAIL_EMAIL')}>`,
+        to,
+        subject,
+        text,
+        html,
+      };
+
+      // Send email
+      const result = await transporter.sendMail(mailOptions);
+      console.log('Email sent:', result);
+      return result;
+    } catch (error) {
+      console.error('Error sending email:', error);
+      throw error;
+    }
 }
-
   // LẤY MÃ Ô TÊ PÊ theo múi giờ csdl
   async getOtp(
   username: string,
-  securityAnswer: string,
-): Promise<{ message: string; otp: string } | null> {
+): Promise<any> {
   const user = await this.userModel.findOne({ username });
   if (!user) {
     throw new UnauthorizedException('Người dùng không tồn tại');
@@ -106,13 +126,10 @@ private async sendOtpToEmail(decryptedAnswer: string, otp: string): Promise<void
     );
   }
 
- 
-  const decryptedAnswer = RSAUtils.decryptWithPrivateKey(user.answer_security, path.join(__dirname, '../../privateKey.pem'));
+  const check = user.answer_security;
+  console.log(check);
+  const decryptedAnswer = RSAUtils.decryptWithPrivateKey(user.answer_security, path.join(__dirname, '../../../privateKey.pem'));
 
-
-  if (securityAnswer.trim() !== decryptedAnswer.trim()) {
-    throw new BadRequestException('Email không chính xác');
-  }
 
   const otp = speakeasy.totp({
     secret: process.env.OTP_SECRET,
@@ -124,12 +141,9 @@ private async sendOtpToEmail(decryptedAnswer: string, otp: string): Promise<void
   user.lastOtpRequest = new Date(now);
 
   await user.save();
-  await this.sendOtpToEmail(decryptedAnswer, otp); 
+  return await this.sendOtpToEmail(decryptedAnswer,"Shiso sends OTP to you", otp); 
 
-  return {
-    message: 'OTP đã được gửi đến email bạn ♡',
-    otp,
-  };
+  
 }
 
 
@@ -187,14 +201,18 @@ private async sendOtpToEmail(decryptedAnswer: string, otp: string): Promise<void
   }
 
   // sẽ sửa type any thành string sau
-  async verifyOtp(username: string, otp: string): Promise<any> {
+  async verifyOtp(username: string, otp: string, password?:string): Promise<any> {
     const user = await this.userModel.findOne({ username });
     if (!user || !user.otp || !user.otpExpires) {
-      throw new BadRequestException('Invalid OTP');
+      throw new BadRequestException({
+        message: 'Invalid OTP',
+      });
     }
 
     if (new Date() > user.otpExpires) {
-      throw new BadRequestException('OTP expired');
+      throw new BadRequestException({
+        message: 'OTP expired',
+      });
     }
 
     const isValidOtp = speakeasy.totp.verify({
@@ -205,6 +223,11 @@ private async sendOtpToEmail(decryptedAnswer: string, otp: string): Promise<void
     });
 
     if (isValidOtp) {
+      if (password) {
+      const hashedPassword: string = await bcrypt.hash(password, 10); 
+      user.password = hashedPassword;
+      await user.save(); 
+      }
       const payload = { username: user.username, sub: user._id };
       const token = this.jwtService.sign(payload);
       const refreshToken = this.jwtService.sign(payload, { expiresIn: '7d' });
@@ -311,4 +334,6 @@ private async sendOtpToEmail(decryptedAnswer: string, otp: string): Promise<void
       return 'bạn không phải Admin để xóa tài khoản của người khác và cũng không phải chủ sở hữu tài khoản';
     }
   }
+
+  
 }

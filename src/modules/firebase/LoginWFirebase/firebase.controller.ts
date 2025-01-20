@@ -24,8 +24,7 @@ export class AuthController {
       throw new BadRequestException('ID Token is missing');
     }
     try {
-      const userData = await this.firebaseAdminService.verifyIdToken(idToken);
-      return { email: userData.email };
+      return await this.firebaseAdminService.verifyIdToken(idToken);
     } catch (error) {
       throw new BadRequestException('Invalid token');
     }

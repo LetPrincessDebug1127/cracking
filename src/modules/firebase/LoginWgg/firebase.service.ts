@@ -3,6 +3,8 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { User } from '../../models/user.schema';
 import { Model } from 'mongoose';
+import { RSAUtils } from '../../../shared/utils/RSAUtils';
+import * as path from 'path';
 
 
 @Injectable()
@@ -21,21 +23,22 @@ constructor(
   async verifyIdToken(idToken: string) {
     try {
       const decodedToken = await admin.auth().verifyIdToken(idToken);
-      // return decodedToken; 
-
-      // const { userData } = decodedToken;
       const { email, uid } = decodedToken;
+      const displayName = `${email.split('@')[0].substring(0, 3)}${Math.floor(Math.random() * 9000) + 1000}`;      console.log(displayName);
       const existingUser = await this.userModel.findOne({ email: email }); 
        if (existingUser) {
           return { message: `Chúc mừng bạn đã đăng nhập thành công với vai trò user!` };
       }
       const hashedPassword = uid;
+      const encryptedAnswer = RSAUtils.encryptWithPublicKey(email, path.join(__dirname, '../../../../publicKey.pem'));
+
       const newUser = new this.userModel({
-        username:email,
-        password:hashedPassword,
-        role:'user',
-        answer_security:'0',
-      })
+      username: displayName,
+      password: hashedPassword,
+      answer_security: encryptedAnswer,
+      role: 'user',
+  
+    });
 
       await newUser.save();
       return { message: `Chúc mừng ${newUser.username}, bạn đã đăng ký thành công với vai trò user!` };
