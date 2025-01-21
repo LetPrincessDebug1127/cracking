@@ -174,33 +174,39 @@ private async sendOtpToEmail(to: string, subject: string, text: string, html?: s
   }
 
   async validateUser(username: string, password: string): Promise<any> {
-    const now = new Date();
+  const now = new Date();
 
-    this.handleFailedAttempt(username);
+  // Xử lý giới hạn số lần đăng nhập sai
+  this.handleFailedAttempt(username);
 
-    const user = await this.userModel.findOne({ username });
+  const user = await this.userModel.findOne({ username });
 
-    if (user && (await bcrypt.compare(password, user.password))) {
-      this.failedAttempts.delete(username);
-
-      const payload = {
-        username: user.username,
-        sub: user._id,
-        role: user.role,
-      };
-      const accessToken = this.jwtService.sign(payload, { expiresIn: '15m' });
-      const refreshToken = this.jwtService.sign(payload, { expiresIn: '7d' });
-
-      return {
-        access_token: accessToken,
-        refresh_token: refreshToken,
-      };
-    } else {
-      throw new BadRequestException('Tên tài khoản hoặc mật khẩu không đúng');
+  if (user && (await bcrypt.compare(password, user.password))) {
+    if (!user.isVerified) {
+      throw new BadRequestException('Tài khoản chưa được xác thực. Vui lòng xác thực tài khoản trước.');
     }
-  }
 
-  // sẽ sửa type any thành string sau
+    // Xóa số lần đăng nhập thất bại sau khi thành công
+    this.failedAttempts.delete(username);
+
+    const payload = {
+      username: user.username,
+      sub: user._id,
+      role: user.role,
+    };
+
+    const accessToken = this.jwtService.sign(payload, { expiresIn: '15m' });
+    const refreshToken = this.jwtService.sign(payload, { expiresIn: '7d' });
+
+    return {
+      access_token: accessToken,
+      refresh_token: refreshToken,
+    };
+  } else {
+    throw new BadRequestException('Tên tài khoản hoặc mật khẩu không đúng');
+  }
+}
+
   async verifyOtp(username: string, otp: string, password?:string): Promise<any> {
     const user = await this.userModel.findOne({ username });
     if (!user || !user.otp || !user.otpExpires) {
@@ -228,6 +234,7 @@ private async sendOtpToEmail(to: string, subject: string, text: string, html?: s
       user.password = hashedPassword;
       await user.save(); 
       }
+      user.isVerified = true;
       const payload = { username: user.username, sub: user._id };
       const token = this.jwtService.sign(payload);
       const refreshToken = this.jwtService.sign(payload, { expiresIn: '7d' });
@@ -237,6 +244,37 @@ private async sendOtpToEmail(to: string, subject: string, text: string, html?: s
       throw new BadRequestException('Invalid OTP');
     }
   }
+
+    async verifyOtpOrDelete(username: string, otp: string): Promise<any> {
+      const user = await this.userModel.findOne({ username });
+
+      if (!user || !user.otp || !user.otpExpires) {
+        throw new BadRequestException({
+          message: 'Invalid OTP',
+        });
+      }
+
+      if (new Date() > user.otpExpires) {
+        throw new BadRequestException({
+          message: 'OTP expired',
+        });
+      }
+
+      const isValidOtp = speakeasy.totp.verify({
+        secret: process.env.OTP_SECRET,
+        encoding: 'base32',
+        token: otp,
+        window: 1,
+      });
+
+      if (isValidOtp) {
+        return { message: 'success' };
+      } else {
+        await this.userModel.deleteOne({ username });
+        throw new BadRequestException('Invalid OTP');
+      }
+    }
+
 
   // async func này dùng để DI vào refresh token service bên file khác.
   async invalidateRefreshToken(refreshToken: string): Promise<void> {

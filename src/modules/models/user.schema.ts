@@ -30,6 +30,9 @@ export class User extends Document {
   @Prop({ default: null })
   lockUntil: Date | null;
 
+  @Prop({ default: false })
+  isVerified: Boolean
+
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

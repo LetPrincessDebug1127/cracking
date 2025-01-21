@@ -17,8 +17,8 @@ export class CreateUserDto {
   password: string;
 
   @ApiProperty({
-    example: 19950701,
-    description: 'Câu trả lời để khôi phục tài khoản khi quên mật khẩu',
+    example: 'shisoremedy@gmail.com',
+    description: 'Gmail của bạn',
   })
   @IsEmail()
   @IsNotEmpty()
