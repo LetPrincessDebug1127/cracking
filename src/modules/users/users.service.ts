@@ -245,37 +245,7 @@ private async sendOtpToEmail(to: string, subject: string, text: string, html?: s
     }
   }
 
-    async verifyOtpOrDelete(username: string, otp: string): Promise<any> {
-      const user = await this.userModel.findOne({ username });
-
-      if (!user || !user.otp || !user.otpExpires) {
-        throw new BadRequestException({
-          message: 'Invalid OTP',
-        });
-      }
-
-      if (new Date() > user.otpExpires) {
-        throw new BadRequestException({
-          message: 'OTP expired',
-        });
-      }
-
-      const isValidOtp = speakeasy.totp.verify({
-        secret: process.env.OTP_SECRET,
-        encoding: 'base32',
-        token: otp,
-        window: 1,
-      });
-
-      if (isValidOtp) {
-        return { message: 'success' };
-      } else {
-        await this.userModel.deleteOne({ username });
-        throw new BadRequestException('Invalid OTP');
-      }
-    }
-
-
+  
   // async func này dùng để DI vào refresh token service bên file khác.
   async invalidateRefreshToken(refreshToken: string): Promise<void> {
     await this.userModel.updateOne(

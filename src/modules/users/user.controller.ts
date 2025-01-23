@@ -77,16 +77,15 @@ export class UsersController {
     }
 
     // lưu rf token vào http only
-    response.cookie('refreshToken', tokens.refresh_token, {
-        httpOnly : true,
-        secure:false, //process.env.NODE_ENV === 'production' cho https thôi, not http mà để sau set
-        sameSite: 'strict', //'strict' để Chống CSRF, nào set production rồi chỉnh lại
-        maxAge: 7 * 24 * 60 * 60 * 1000,
-
-    })
-  return { access_token: tokens.access_token };
-  }
-  @Post('get-otp-forget-password')
+    response.cookie('refresh_token', tokens.refresh_token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production', 
+        sameSite: 'strict', 
+        maxAge: 7 * 24 * 60 * 60 * 1000, 
+    });
+    return { access_token: tokens.access_token };
+    }
+  @Post('get-otp')
   @ApiOperation({
     summary: 'Lấy OTP từ security answer, bạn chỉ có thể gửi OTP mỗi 5 phút',
   })
@@ -130,11 +129,26 @@ export class UsersController {
     },
   })
   async verifyOtp(
-    @Body() { username, otp }: { username: string; otp: string },
-  ) {
-    return await this.usersService.verifyOtp(username, otp);
+      @Body() { username, otp }: { username: string; otp: string },
+      @Res({ passthrough: true }) response: Response,
+    ) {
+      const { access_token, refresh_token } = await this.usersService.verifyOtp(username, otp);
 
-  }
+      if (!access_token || !refresh_token) {
+        throw new UnauthorizedException('Invalid OTP or failed to generate tokens');
+      }
+
+      // Lưu refresh token vào HTTP-only cookie
+      response.cookie('refresh_token', refresh_token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production', 
+        sameSite: 'strict', 
+        maxAge: 7 * 24 * 60 * 60 * 1000, 
+      });
+
+      // Trả về access token trong phản hồi
+      return { access_token };
+    }
   @Post('refresh-token')
   @ApiOperation({
     summary: '',

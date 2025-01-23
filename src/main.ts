@@ -33,7 +33,7 @@ async function bootstrap() {
     .build();
   const document = SwaggerModule.createDocument(app, configS);
   SwaggerModule.setup('api-docs', app, document);
-
+  app.use(cookieParser()); 
   await app.listen(process.env.PORT);
 }
 bootstrap();
